@@ -1,0 +1,116 @@
+/*
+|--------------------------------------------------------------------------
+| Custom Color Variables (Matching RBM Logo)
+|--------------------------------------------------------------------------
+|
+| Definisi variabel warna utama perusahaan:
+| --rbm-dark: Biru Tua Navy yang Dominan
+| --rbm-accent: Oranye Terang yang Berenergi
+|
+*/
+:root {
+    /* Biru Tua Navy (Deep Indigo Navy) - Untuk background dan teks gelap utama */
+    --rbm-dark: #161f36;
+
+    /* Oranye Terang (Bright Orange) - Untuk aksen, hover, tombol utama */
+    --rbm-accent: #FF7518;
+
+    /* Warna teks di atas background gelap (Putih) */
+    --text-on-dark: #ffffff;
+
+    /* Warna teks sekunder (Abu-abu muda untuk kontras di atas gelap) */
+    --text-secondary-dark: #9ca3af; /* gray-400 */
+}
+
+
+/* |--------------------------------------------------------------------------
+| Base Styles & Typography
+|--------------------------------------------------------------------------
+*/
+body {
+    /* Menggunakan font Poppins atau fallback ke sans-serif */
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    /* Tailwind CSS base reset akan diterapkan setelah ini */
+}
+
+.font-times {
+    font-family: 'Times New Roman', serif;
+}
+
+
+/* |--------------------------------------------------------------------------
+| Custom Component: Navigation Links (Matching RBM)
+|--------------------------------------------------------------------------
+| Mengganti kelas Tailwind 'nav-link' dan 'nav-active' yang didefinisikan
+| sebelumnya di tag <style> menjadi definisi CSS murni.
+*/
+
+/* Gaya dasar link navigasi di navbar gelap */
+.nav-link {
+    position: relative;
+    /* Teks Putih di atas background Navy */
+    color: var(--text-on-dark);
+    padding: 8px 12px;
+    transition: color 0.3s, background-color 0.3s;
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+}
+
+/* Garis bawah dekoratif (Oranye) */
+.nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px; /* Sedikit lebih ke bawah dari link */
+    width: 0;
+    height: 3px;
+    transition: all 0.3s ease-in-out;
+    background-color: var(--rbm-accent);
+}
+
+/* Hover state (Teks dan garis menjadi Oranye) */
+.nav-link:hover {
+    color: var(--rbm-accent);
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* Active state (Tautan yang sedang dikunjungi) */
+.nav-active {
+    font-weight: 600;
+    color: var(--rbm-accent);
+}
+
+.nav-active::after {
+    width: 100%;
+}
+
+
+/* |--------------------------------------------------------------------------
+| Custom Component: Dropdown Menu (Internal Link Styling)
+|--------------------------------------------------------------------------
+*/
+.dropdown-content a {
+    /* Gaya link di dalam dropdown (Putih/terang) */
+    color: #1f2937; /* Gray-800 */
+    transition: color 0.2s, background-color 0.2s;
+}
+
+.dropdown-content a:hover {
+    /* Hover link di dropdown (Background terang, Teks Oranye) */
+    background-color: #f3f4f6; /* Gray-100 */
+    color: var(--rbm-accent);
+}
+
+
+/* |--------------------------------------------------------------------------
+| Utility for Alpine.js (Jika masih digunakan)
+|--------------------------------------------------------------------------
+*/
+[x-cloak] {
+    display: none !important;
+}
