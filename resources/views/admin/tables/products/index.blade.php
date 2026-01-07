@@ -10,55 +10,31 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {{-- Tailwind CSS --}}
     <script src="https://cdn.tailwindcss.com"></script>
-    {{-- Font Awesome --}}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    {{-- Google Fonts: Poppins --}}
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Definisi Warna Kustom (Tower Theme) */
         .text-dark-tower { color: #2C3E50; }
         .bg-dark-tower { background-color: #2C3E50; }
         .text-accent-tower { color: #FF8C00; }
         .bg-accent-tower { background-color: #FF8C00; }
         .hover\:bg-accent-dark:hover { background-color: #E67E22; }
         .shadow-soft { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f0f2f5;
-        }
-
-        /* Animasi Action Icon */
-        .action-icon {
-            transition: all 0.2s ease;
-        }
-        .action-icon:hover {
-            transform: scale(1.2);
-        }
-
-        /* Overide Laravel Pagination Style agar lebih cantik */
-        nav[role="navigation"] {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-        }
+        body { font-family: 'Poppins', sans-serif; background-color: #f0f2f5; }
+        .action-icon { transition: all 0.2s ease; }
+        .action-icon:hover { transform: scale(1.2); }
+        nav[role="navigation"] { display: flex; justify-content: space-between; align-items: center; width: 100%; }
     </style>
 </head>
 
 <body class="bg-gray-100">
-
     <div class="main-content flex-1 p-4 sm:p-6">
         <div class="bg-white rounded-xl shadow-soft p-4 sm:p-6">
 
             {{-- Header --}}
             <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 border-b pb-4 border-gray-100">
                 <h1 class="text-3xl font-bold text-dark-tower">Daftar Produk</h1>
-
                 <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-                    {{-- Pencarian --}}
                     <div class="relative w-full sm:w-64">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3">
                             <i class="fas fa-search text-gray-400"></i>
@@ -66,7 +42,6 @@
                         <input type="search" id="productSearch" placeholder="Cari produk..."
                             class="w-full pl-10 pr-4 py-2 border rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-accent-tower">
                     </div>
-                    {{-- Tombol Tambah --}}
                     <a href="{{ route('admin.products.create') }}"
                         class="bg-accent-tower text-white px-4 py-2 rounded-lg font-semibold hover:bg-accent-dark transition-colors duration-200 flex items-center justify-center space-x-2 w-full sm:w-auto shadow-md">
                         <i class="fas fa-plus"></i>
@@ -121,19 +96,19 @@
                 </div>
             </div>
 
-            {{-- TAB FILTER --}}
+            {{-- Tab Filter --}}
             <div class="flex space-x-4 mb-6 border-b">
                 <a href="{{ route('admin.products.index') }}"
                    class="pb-2 px-1 text-sm font-semibold {{ !request('type') ? 'border-b-2 border-accent-tower text-dark-tower' : 'text-gray-400 hover:text-gray-600' }}">
-                    Semua
+                   Semua
                 </a>
                 <a href="{{ route('admin.products.index', ['type' => 'barang']) }}"
                    class="pb-2 px-1 text-sm font-semibold {{ request('type') == 'barang' ? 'border-b-2 border-accent-tower text-dark-tower' : 'text-gray-400 hover:text-gray-600' }}">
-                    Barang
+                   Barang
                 </a>
                 <a href="{{ route('admin.products.index', ['type' => 'jasa']) }}"
                    class="pb-2 px-1 text-sm font-semibold {{ request('type') == 'jasa' ? 'border-b-2 border-accent-tower text-dark-tower' : 'text-gray-400 hover:text-gray-600' }}">
-                    Jasa
+                   Jasa
                 </a>
             </div>
 
@@ -153,7 +128,6 @@
                     <tbody class="text-gray-700 text-sm font-light" id="productTableBody">
                         @forelse($products as $product)
                             <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors duration-200 product-row">
-                                {{-- Penomoran yang benar untuk Pagination --}}
                                 <td class="py-4 px-4 text-left font-medium">
                                     {{ $loop->iteration + ($products->currentPage() - 1) * $products->perPage() }}
                                 </td>
@@ -179,14 +153,20 @@
                                     @if($product->image)
                                         @php
                                             $namaFile = trim($product->image);
-                                            // Ubah Logika: Cek folder assets/img/pabrikasi
-                                            if (str_contains($namaFile, 'assets/')) {
-                                                $urlGambar = asset($namaFile);
+                                            $pathFinal = "";
+
+                                            if (file_exists(public_path('assets/img/pabrikasi/' . $namaFile))) {
+                                                $pathFinal = asset('assets/img/pabrikasi/' . $namaFile);
+                                            } elseif (file_exists(public_path('assets/img/produk barang/' . $namaFile))) {
+                                                $pathFinal = asset('assets/img/produk barang/' . $namaFile);
+                                            } elseif (file_exists(public_path('assets/img/produk jasa/' . $namaFile))) {
+                                                $pathFinal = asset('assets/img/produk jasa/' . $namaFile);
                                             } else {
-                                                $urlGambar = asset('assets/img/pabrikasi/' . $namaFile);
+                                                $pathFinal = asset('storage/' . $namaFile);
                                             }
                                         @endphp
-                                        <img src="{{ $urlGambar }}" alt="{{ $product->name }}" class="w-12 h-12 object-cover rounded-lg border shadow-sm bg-white"
+                                        <img src="{{ $pathFinal }}" alt="{{ $product->name }}" 
+                                             class="w-12 h-12 object-cover rounded-lg border shadow-sm bg-white"
                                              onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=No+Image';">
                                     @else
                                         <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center border border-dashed">
@@ -225,25 +205,18 @@
                 </table>
             </div>
 
-            {{-- Bagian Pagination --}}
             @if($products->hasPages())
                 <div class="mt-8 py-4 border-t border-gray-100">
-                    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div class="w-full">
-                            {{ $products->links('pagination::tailwind') }}
-                        </div>
-                    </div>
+                    {{ $products->links('pagination::tailwind') }}
                 </div>
             @endif
         </div>
     </div>
 
     <script>
-        // Script Cari Produk
         document.getElementById('productSearch').addEventListener('keyup', function(e) {
             const term = e.target.value.toLowerCase();
             const rows = document.querySelectorAll('.product-row');
-
             rows.forEach(row => {
                 const name = row.cells[1].textContent.toLowerCase();
                 row.style.display = name.includes(term) ? '' : 'none';
@@ -252,5 +225,4 @@
     </script>
 </body>
 </html>
-
 @endsection
