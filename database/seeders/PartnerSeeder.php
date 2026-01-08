@@ -22,32 +22,32 @@ class PartnerSeeder extends Seeder
             [
                 'name' => 'PT. Daya Mitra Telekomunikasi',
                 'city' => 'Jakarta',
-                'logo' => 'assets/img/tower provider/PT. Daya Mitra Telekomunikasi.png',
+                'logo' => 'assets/img/tower-provider/pt-daya-mitra-telekomunikasi.png',
             ],
             [
                 'name' => 'PT. Infraco Daya Mitra',
                 'city' => 'Jakarta',
-                'logo' => 'assets/img/tower provider/PT. Infraco Daya Mitra.png',
+                'logo' => 'assets/img/tower-provider/pt-infraco-daya-mitra.png',
             ],
             [
                 'name' => 'PT. Koperasi Jasa Daya Mitra',
                 'city' => 'Jakarta',
-                'logo' => 'assets/img/tower provider/PT. Koperasi Jasa Daya Mitra.png',
+                'logo' => 'assets/img/tower-provider/pt-koperasi-jasa-daya-mitra.png',
             ],
             [
                 'name' => 'PT. Persada Sokka Tama',
                 'city' => 'Jakarta',
-                'logo' => 'assets/img/tower provider/PT. Persada Sokka Tama.png',
+                'logo' => 'assets/img/tower-provider/pt-persada-sokka-tama.png',
             ],
             [
                 'name' => 'PT. Solusi Tunas Pratama Tbk',
                 'city' => 'Jakarta',
-                'logo' => 'assets/img/tower provider/PT. Solusi Tunas Pratama Tbk.png',
+                'logo' => 'assets/img/tower-provider/pt-tunas-pratama-tbk.png',
             ],
             [
                 'name' => 'PT. Tower Bersama Infrastructure Tbk',
                 'city' => 'Jakarta',
-                'logo' => 'assets/img/tower provider/PT. Tower Bersama Infrastructure Tbk.png',
+                'logo' => 'assets/img/tower-provider/pt-tower-bersama-infrastructure-tbk.png',
             ],
         ];
 
@@ -56,17 +56,17 @@ class PartnerSeeder extends Seeder
             [
                 'name' => 'PT. Akurasi Konstruksi Indonesia',
                 'city' => 'Bogor',
-                'logo' => 'assets/img/non tower provider/pt akurasi konstruksi indonesia.png',
+                'logo' => 'assets/img/non-tower-provider/pt-akurasi-konstruksi-indonesia.png',
             ],
             [
                 'name' => 'PT. Duta Solusi Metalindo',
                 'city' => 'Jakarta',
-                'logo' => 'assets/img/non tower provider/PT. Duta Solusi Metalindo.png',
+                'logo' => 'assets/img/non-tower-provider/pt-duta-solusi-metalindo.png',
             ],
             [
                 'name' => 'PT. Quadran Empat Persada',
                 'city' => 'Jakarta',
-                'logo' => 'assets/img/non tower provider/PT. Quadran Empat Persada.jpg',
+                'logo' => 'assets/img/non-tower-provider/pt-quadran-empat-persada.jpg',
             ],
             [
                 'name' => 'CV. Cahaya Abadi Teknik',
@@ -97,7 +97,6 @@ class PartnerSeeder extends Seeder
 
         $partners = [];
 
-        // Mapping data Tower Provider ke format database
         foreach ($towerProviders as $item) {
             $partners[] = [
                 'name'              => $item['name'],
@@ -106,7 +105,7 @@ class PartnerSeeder extends Seeder
                 'logo'              => $item['logo'],
                 'sector'            => 'Tower Provider',
                 'city'              => $item['city'],
-                'company_contact'   => '-', // Default jika kosong
+                'company_contact'   => '-',
                 'publisher'         => 'Admin',
                 'partnership_date'  => Carbon::now(),
                 'created_at'        => Carbon::now(),
@@ -114,7 +113,6 @@ class PartnerSeeder extends Seeder
             ];
         }
 
-        // Mapping data Non Tower Provider ke format database
         foreach ($nonTowerProviders as $item) {
             $partners[] = [
                 'name'              => $item['name'],
@@ -123,7 +121,7 @@ class PartnerSeeder extends Seeder
                 'logo'              => $item['logo'],
                 'sector'            => 'Non Tower Provider',
                 'city'              => $item['city'],
-                'company_contact'   => '-', // Default jika kosong
+                'company_contact'   => '-',
                 'publisher'         => 'Admin',
                 'partnership_date'  => Carbon::now(),
                 'created_at'        => Carbon::now(),
@@ -131,7 +129,6 @@ class PartnerSeeder extends Seeder
             ];
         }
 
-        // Eksekusi insert massal
         DB::table('partners')->insert($partners);
     }
 }

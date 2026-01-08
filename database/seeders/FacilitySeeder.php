@@ -3,187 +3,173 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\Product;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
-class FacilitySeeder extends Seeder
+class ProductSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
-        DB::table('facilities')->truncate();
+        // Reset data agar tidak terjadi duplikasi saat seeding ulang
+        Schema::disableForeignKeyConstraints();
+        Product::truncate();
+        Schema::enableForeignKeyConstraints();
 
-        DB::table('facilities')->insert([
+        /*
+        |--------------------------------------------------------------------------
+        | PRODUK BARANG
+        |--------------------------------------------------------------------------
+        */
+        $produkBarang = [
+            [
+                'name' => 'Transportable BTS ( Combat )',
+                'description' => 'Unit Transportable BTS (Combat) untuk kebutuhan jaringan sementara maupun darurat dengan standar industri telekomunikasi.',
+                'price' => 250000000,
+                'image' => 'assets/img/produk-barang/transportable-bts-combat.jpeg',
+            ],
+            [
+                'name' => 'Tower On Trailer',
+                'description' => 'Tower mobile berbasis trailer yang fleksibel untuk deployment cepat di berbagai medan.',
+                'price' => 300000000,
+                'image' => 'assets/img/produk-barang/tower-on-trailer.jpg',
+            ],
+            [
+                'name' => 'Truck Head Transporter Combat',
+                'description' => 'Kendaraan transporter khusus untuk mobilisasi unit BTS Combat secara aman dan efisien.',
+                'price' => 450000000,
+                'image' => 'assets/img/produk-barang/truck-headtransporter-combat.png',
+            ],
+            [
+                'name' => 'Guyed Mast Tower',
+                'description' => 'Menara guyed mast dengan sistem penyangga kabel untuk kestabilan dan efisiensi struktur.',
+                'price' => 180000000,
+                'image' => 'assets/img/produk-barang/guyed-mast-tower.jpg',
+            ],
+            [
+                'name' => 'Monopole',
+                'description' => 'Tower monopole dengan desain ramping dan estetis untuk area urban.',
+                'price' => 220000000,
+                'image' => 'assets/img/produk-barang/monopole.jpg',
+            ],
+            [
+                'name' => 'Perkuatan Tower SST dan Monopole',
+                'description' => 'Solusi perkuatan struktur tower SST dan monopole untuk meningkatkan keamanan dan daya tahan.',
+                'price' => 150000000,
+                'image' => 'assets/img/produk-barang/perkuatan-tower-sst-dan-monopole.jpg',
+            ],
+            [
+                'name' => 'Steel Structure Produk',
+                'description' => 'Produk struktur baja berkualitas tinggi untuk kebutuhan industri dan infrastruktur.',
+                'price' => 120000000,
+                'image' => 'assets/img/produk-barang/steel-structure-produk.jpg',
+            ],
+            [
+                'name' => 'Sheet Metal Produk',
+                'description' => 'Produk sheet metal presisi tinggi untuk berbagai kebutuhan teknis.',
+                'price' => 90000000,
+                'image' => 'assets/img/produk-barang/sheet-metal-produk.jpg',
+            ],
+            [
+                'name' => 'Arsitektur & Furniture',
+                'description' => 'Produk arsitektur dan furniture berbahan logam dengan desain modern dan fungsional.',
+                'price' => 75000000,
+                'image' => 'assets/img/produk-barang/arsitektur-furniture.jpeg',
+            ],
+            [
+                'name' => 'Work Aid Tools',
+                'description' => 'Peralatan pendukung kerja untuk operasional lapangan dan instalasi.',
+                'price' => 50000000,
+                'image' => 'assets/img/produk-barang/work-aid-tools.png',
+            ],
+        ];
 
-            /*
-            |------------------------------------------------------------------
-            | PERALATAN PABRIKASI
-            |------------------------------------------------------------------
-            */
-            [
-                'name' => 'Mesin Plasma Cutting',
-                'description' => 'Mesin pemotong baja presisi tinggi menggunakan teknologi plasma.',
-                'image' => 'assets/img/pabrikasi/MesinPlasmaCutting2.png',
-                'type' => 'Peralatan Pabrikasi',
-                'publisher' => 'Admin',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'name' => 'Mesin Bending',
-                'description' => 'Mesin pembengkok plat baja untuk kebutuhan fabrikasi.',
-                'image' => 'assets/img/pabrikasi/Mesin-bending.jpeg',
-                'type' => 'Peralatan Pabrikasi',
-                'publisher' => 'Admin',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'name' => 'Mesin Las CO 3 Phase',
-                'description' => 'Mesin las industri 3 phase untuk struktur baja.',
-                'image' => 'assets/img/pabrikasi/Mesin-las-CO3-Phase.jpg',
-                'type' => 'Peralatan Pabrikasi',
-                'publisher' => 'Admin',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'name' => 'Mesin Grinding',
-                'description' => 'Mesin penghalus dan perapih hasil las.',
-                'image' => 'assets/img/pabrikasi/Mesin-Grinding.jpg',
-                'type' => 'Peralatan Pabrikasi',
-                'publisher' => 'Admin',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'name' => 'Mesin Cutting Circle',
-                'description' => 'Mesin pemotong material berbentuk lingkaran.',
-                'image' => 'assets/img/pabrikasi/Mesin-Cutting-Circle.jpg',
-                'type' => 'Peralatan Pabrikasi',
-                'publisher' => 'Admin',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'name' => 'Mesin Kompresor',
-                'description' => 'Penyedia tekanan udara operasional.',
-                'image' => 'assets/img/pabrikasi/Mesin-Kompresor.jpeg',
-                'type' => 'Peralatan Pabrikasi',
-                'publisher' => 'Admin',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'name' => 'Mesin Drilling Magnet',
-                'description' => 'Mesin bor magnetik presisi tinggi.',
-                'image' => 'assets/img/pabrikasi/Mesin Drilling Magnet.png',
-                'type' => 'Peralatan Pabrikasi',
-                'publisher' => 'Admin',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'name' => 'Tools Kit Pabrikasi',
-                'description' => 'Perlengkapan tools fabrikasi.',
-                'image' => 'assets/img/pabrikasi/Tools-Kit-Pabrikasi.jpg',
-                'type' => 'Peralatan Pabrikasi',
-                'publisher' => 'Admin',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
+        foreach ($produkBarang as $item) {
+            Product::create([
+                'name' => $item['name'],
+                'slug' => Str::slug($item['name']),
+                'description' => $item['description'],
+                'type' => 'barang',
+                'price' => $item['price'],
+                'image' => $item['image'],
+            ]);
+        }
 
-            /*
-            |------------------------------------------------------------------
-            | PERALATAN MAINTENANCE
-            |------------------------------------------------------------------
-            */
+        /*
+        |--------------------------------------------------------------------------
+        | PRODUK JASA
+        |--------------------------------------------------------------------------
+        */
+        $produkJasa = [
             [
-                'name' => 'Tension Meter',
-                'description' => 'Alat ukur ketegangan kabel.',
-                'image' => 'assets/img/maintenance/TensionMeter.jpg',
-                'type' => 'Peralatan Maintenance',
-                'publisher' => 'Admin',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
+                'name' => 'Service & Maintenance Transportable BTS ( Combat )',
+                'description' => 'Layanan perawatan dan servis rutin BTS Combat agar tetap optimal dan siap operasional.',
+                'price' => 50000000,
+                'image' => 'assets/img/produk-jasa/service-maintenance-transportable-bts-combat.jpeg',
             ],
             [
-                'name' => 'Ampere Pliers',
-                'description' => 'Alat ukur arus listrik.',
-                'image' => 'assets/img/maintenance/Ampere-Pliers.jpeg',
-                'type' => 'Peralatan Maintenance',
-                'publisher' => 'Admin',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
+                'name' => 'Service & Maintenance Guyed Mast tower',
+                'description' => 'Perawatan berkala tower guyed mast untuk menjaga kestabilan dan keamanan struktur.',
+                'price' => 40000000,
+                'image' => 'assets/img/produk-jasa/service-maintenance-guyed-mast-tower.jpeg',
             ],
             [
-                'name' => 'Grounding Tester',
-                'description' => 'Alat uji grounding.',
-                'image' => 'assets/img/maintenance/Grounding-Tester.jpg',
-                'type' => 'Peralatan Maintenance',
-                'publisher' => 'Admin',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
+                'name' => 'Service & Maintenance Truck Head',
+                'description' => 'Servis kendaraan transporter combat untuk memastikan kelancaran mobilisasi.',
+                'price' => 30000000,
+                'image' => 'assets/img/produk-jasa/service-maintenance-truck-head.jpg',
             ],
             [
-                'name' => 'Theodolite',
-                'description' => 'Alat ukur sudut dan elevasi.',
-                'image' => 'assets/img/maintenance/Theodolite.jpg',
-                'type' => 'Peralatan Maintenance',
-                'publisher' => 'Admin',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
+                'name' => 'Delivery, Instalasi & Dismantel Combat & Guyed Mast',
+                'description' => 'Layanan pengiriman, pemasangan, dan pembongkaran tower dan BTS sesuai standar keselamatan.',
+                'price' => 60000000,
+                'image' => 'assets/img/produk-jasa/delivery-instalasi-dismantel-combat-guyed-mast.jpg',
             ],
             [
-                'name' => 'Vernier Caliper',
-                'description' => 'Alat ukur presisi.',
-                'image' => 'assets/img/maintenance/Vernier-Caliper.jpg',
-                'type' => 'Peralatan Maintenance',
-                'publisher' => 'Admin',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
+                'name' => 'Permanenisasi Combat',
+                'description' => 'Proses permanenisasi BTS Combat menjadi instalasi jangka panjang.',
+                'price' => 80000000,
+                'image' => 'assets/img/produk-jasa/permanenisasi-combat.jpeg',
             ],
             [
-                'name' => 'Tools Kit Maintenance',
-                'description' => 'Tools lapangan maintenance.',
-                'image' => 'assets/img/maintenance/Tools-Kit-Maintenance.jpg',
-                'type' => 'Peralatan Maintenance',
-                'publisher' => 'Admin',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
+                'name' => 'Relokasi Perangkat',
+                'description' => 'Layanan pemindahan perangkat telekomunikasi secara aman dan terencana.',
+                'price' => 45000000,
+                'image' => 'assets/img/produk-jasa/relokasi-perangkat.jpeg',
             ],
+            [
+                'name' => 'Collocation CME',
+                'description' => 'Layanan collocation CME untuk optimalisasi penggunaan infrastruktur tower.',
+                'price' => 70000000,
+                'image' => 'assets/img/produk-jasa/collocation-cme.jpeg',
+            ],
+            [
+                'name' => 'Desain Engineering',
+                'description' => 'Perencanaan dan desain engineering sesuai kebutuhan proyek dan standar teknis.',
+                'price' => 55000000,
+                'image' => 'assets/img/produk-jasa/desain-engineering.jpg',
+            ],
+            [
+                'name' => 'Machining',
+                'description' => 'Layanan machining presisi tinggi untuk komponen industri dan telekomunikasi.',
+                'price' => 65000000,
+                'image' => 'assets/img/produk-jasa/machining.webp',
+            ],
+        ];
 
-            /*
-            |------------------------------------------------------------------
-            | KENDARAAN OPERASIONAL
-            |------------------------------------------------------------------
-            */
-            [
-                'name' => 'Head Truck',
-                'description' => 'Kendaraan pengangkut material.',
-                'image' => 'assets/img/kendaraan/HeadTruck.png',
-                'type' => 'Kendaraan Operasional',
-                'publisher' => 'Admin',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'name' => 'Pick Up',
-                'description' => 'Mobilisasi cepat lapangan.',
-                'image' => 'assets/img/kendaraan/PickUp.png',
-                'type' => 'Kendaraan Operasional',
-                'publisher' => 'Admin',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'name' => 'Minibus',
-                'description' => 'Transportasi teknisi.',
-                'image' => 'assets/img/kendaraan/MiniBus.jpg',
-                'type' => 'Kendaraan Operasional',
-                'publisher' => 'Admin',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-        ]);
+        foreach ($produkJasa as $item) {
+            Product::create([
+                'name' => $item['name'],
+                'slug' => Str::slug($item['name']),
+                'description' => $item['description'],
+                'type' => 'jasa',
+                'price' => $item['price'],
+                'image' => $item['image'],
+            ]);
+        }
     }
 }

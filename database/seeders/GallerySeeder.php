@@ -38,7 +38,7 @@ class GallerySeeder extends Seeder
 
         Gallery::create([
             'title' => 'Inspeksi Lapangan OIP',
-            'image' => 'gallery/OIP.jpg',
+            'image' => 'gallery/oip.jpg',
         ]);
 
         Gallery::create([
