@@ -42,8 +42,9 @@ class ProductController extends Controller
         $validated['slug'] = $this->createUniqueSlug($validated['name']);
 
         if ($request->hasFile('image')) {
-            // Simpan ke storage/app/public/uploads/products
-            $validated['image'] = $request->file('image')->store('uploads/products', 'public');
+            // Path: storage/app/public/produk (lebih simple)
+            $path = $request->file('image')->store('produk', 'public');
+            $validated['image'] = basename($path); 
         }
 
         Product::create($validated);
@@ -77,18 +78,19 @@ class ProductController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            // Hapus gambar lama HANYA jika gambar tersebut berada di folder storage (bukan assets/img)
-            if ($product->image && !str_contains($product->image, 'assets/img')) {
-                Storage::disk('public')->delete($product->image);
+            // Hapus gambar lama jika ada di storage
+            if ($product->image && Storage::disk('public')->exists('produk/' . $product->image)) {
+                Storage::disk('public')->delete('produk/' . $product->image);
             }
-            $validated['image'] = $request->file('image')->store('uploads/products', 'public');
+            
+            $path = $request->file('image')->store('produk', 'public');
+            $validated['image'] = basename($path);
         }
 
         $product->update($validated);
         return redirect()->route('admin.products.index')->with('success', '✅ Produk berhasil diperbarui!');
     }
 
-    // Helper untuk membuat slug unik
     private function createUniqueSlug($name, $id = null)
     {
         $slug = Str::slug($name);
@@ -105,8 +107,8 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        if ($product->image && !str_contains($product->image, 'assets/img')) {
-            Storage::disk('public')->delete($product->image);
+        if ($product->image && Storage::disk('public')->exists('produk/' . $product->image)) {
+            Storage::disk('public')->delete('produk/' . $product->image);
         }
         $product->delete();
         return redirect()->route('admin.products.index')->with('success', '🗑️ Produk berhasil dihapus!');
