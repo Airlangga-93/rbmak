@@ -6,146 +6,107 @@ use App\Http\Controllers\Controller;
 use App\Models\Partner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 class PartnerController extends Controller
 {
-    /**
-     * Menampilkan daftar mitra industri.
-     */
     public function index()
     {
         $partners = Partner::latest()->get();
         return view('admin.tables.partners.index', compact('partners'));
     }
 
-    /**
-     * Menampilkan form tambah mitra.
-     */
     public function create()
     {
         return view('admin.tables.partners.create');
     }
 
-    /**
-     * Menyimpan data mitra baru ke database.
-     */
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
             'logo' => 'required|image|mimes:jpeg,png,jpg,svg,webp|max:2048',
             'sector' => 'required|string|max:255',
             'city' => 'required|string|max:255',
-            'company_contact' => 'nullable|string|max:255',
             'partnership_date' => 'required|date',
-        ], [
-            'name.required' => 'Nama mitra harus diisi.',
-            'logo.required' => 'Logo harus diunggah.',
-            'logo.image' => 'File harus berupa gambar.',
-            'logo.mimes' => 'Format gambar yang diizinkan adalah jpeg, png, jpg, svg, atau webp.',
-            'logo.max' => 'Ukuran gambar tidak boleh lebih dari 2MB.',
-            'sector.required' => 'Sektor harus diisi.',
-            'city.required' => 'Kota harus diisi.',
-            'partnership_date.required' => 'Tanggal kerja sama harus diisi.',
         ]);
 
-        $validatedData['slug'] = Str::slug($request->name) . '-' . time();
-        $validatedData['publisher'] = Auth::user()->name;
+        $data = $request->all();
+        $data['slug'] = Str::slug($request->name) . '-' . time();
+        $data['publisher'] = Auth::user()->name;
 
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $fileName = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
 
-            // Menggunakan move() ke jalur absolut storage untuk memastikan file terunggah di Hostinger
-            $file->move(base_path('../storage/app/public/partner_logos'), $fileName);
+            // Lokasi penyimpanan di gudang storage
+            $destinationPath = storage_path('app/public/partner_logos');
 
-            // Simpan path relatif untuk database
-            $validatedData['logo'] = 'partner_logos/' . $fileName;
+            // Cek jika folder belum ada, buat foldernya
+            if (!File::isDirectory($destinationPath)) {
+                File::makeDirectory($destinationPath, 0777, true, true);
+            }
+
+            // Paksa pindah file
+            $file->move($destinationPath, $fileName);
+
+            // Simpan path yang akan dipanggil oleh asset('storage/...')
+            $data['logo'] = 'partner_logos/' . $fileName;
         }
 
-        Partner::create($validatedData);
+        Partner::create($data);
 
-        return redirect()->route('admin.partners.index')->with('success', '✅ Mitra industri berhasil ditambahkan!');
+        return redirect()->route('admin.partners.index')->with('success', '✅ Customer berhasil ditambahkan!');
     }
 
-    /**
-     * Menampilkan detail mitra.
-     */
-    public function show(Partner $partner)
-    {
-        return view('admin.tables.partners.show', compact('partner'));
-    }
-
-    /**
-     * Menampilkan form edit mitra.
-     */
     public function edit(Partner $partner)
     {
         return view('admin.tables.partners.edit', compact('partner'));
     }
 
-    /**
-     * Memperbarui data mitra di database.
-     */
     public function update(Request $request, Partner $partner)
     {
-        $validatedData = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,svg,webp|max:2048',
             'sector' => 'required|string|max:255',
             'city' => 'required|string|max:255',
-            'company_contact' => 'nullable|string|max:255',
             'partnership_date' => 'required|date',
-        ], [
-            'name.required' => 'Nama mitra harus diisi.',
-            'sector.required' => 'Sektor harus diisi.',
-            'city.required' => 'Kota harus diisi.',
-            'partnership_date.required' => 'Tanggal kerja sama harus diisi.',
         ]);
 
-        $validatedData['slug'] = Str::slug($request->name) . '-' . time();
-        $validatedData['publisher'] = Auth::user()->name;
+        $data = $request->all();
+        $data['slug'] = Str::slug($request->name) . '-' . time();
+        $data['publisher'] = Auth::user()->name;
 
         if ($request->hasFile('logo')) {
-            // Hapus logo lama jika ada dan bukan dari assets (seeder)
-            if ($partner->logo && !str_contains($partner->logo, 'assets/img')) {
-                $oldPath = base_path('../storage/app/public/' . $partner->logo);
-                if (file_exists($oldPath)) {
-                    unlink($oldPath);
-                }
+            // Hapus logo lama jika ada
+            $oldPath = storage_path('app/public/' . $partner->logo);
+            if (File::exists($oldPath) && !str_contains($partner->logo, 'assets/')) {
+                File::delete($oldPath);
             }
 
             $file = $request->file('logo');
             $fileName = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+            $destinationPath = storage_path('app/public/partner_logos');
 
-            // Gunakan move() kembali untuk konsistensi di server
-            $file->move(base_path('../storage/app/public/partner_logos'), $fileName);
-            $validatedData['logo'] = 'partner_logos/' . $fileName;
+            $file->move($destinationPath, $fileName);
+            $data['logo'] = 'partner_logos/' . $fileName;
         }
 
-        $partner->update($validatedData);
+        $partner->update($data);
 
-        return redirect()->route('admin.partners.index')->with('success', '✅ Mitra industri berhasil diperbarui!');
+        return redirect()->route('admin.partners.index')->with('success', '✅ Customer berhasil diperbarui!');
     }
 
-    /**
-     * Menghapus mitra.
-     */
     public function destroy(Partner $partner)
     {
-        if ($partner->logo && !str_contains($partner->logo, 'assets/img')) {
-            $oldPath = base_path('../storage/app/public/' . $partner->logo);
-            if (file_exists($oldPath)) {
-                unlink($oldPath);
-            }
+        $path = storage_path('app/public/' . $partner->logo);
+        if (File::exists($path) && !str_contains($partner->logo, 'assets/')) {
+            File::delete($path);
         }
 
         $partner->delete();
-
-        return redirect()->route('admin.partners.index')->with('success', '🗑️ Mitra industri berhasil dihapus!');
+        return redirect()->route('admin.partners.index')->with('success', '🗑️ Customer berhasil dihapus!');
     }
 }
