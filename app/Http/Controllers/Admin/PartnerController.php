@@ -56,23 +56,17 @@ class PartnerController extends Controller
         $validatedData['publisher'] = Auth::user()->name;
 
         if ($request->hasFile('logo')) {
-            // Simpan ke folder: storage/app/public/partner_logos
+            // Kita simpan file ke folder 'partner_logos' di disk 'public'
             $path = $request->file('logo')->store('partner_logos', 'public');
-            // Simpan path relatif untuk kemudahan pemanggilan asset('storage/' . $partner->logo)
-            $validatedData['logo'] = 'partner_logos/' . basename($path);
+
+            // PERBAIKAN: Kita simpan path lengkap agar di Blade cukup panggil asset('storage/' . $partner->logo)
+            // Hasil simpan di DB: "partner_logos/namafile.jpg"
+            $validatedData['logo'] = $path;
         }
 
         Partner::create($validatedData);
 
         return redirect()->route('admin.partners.index')->with('success', '✅ Mitra industri berhasil ditambahkan!');
-    }
-
-    /**
-     * Menampilkan detail mitra.
-     */
-    public function show(Partner $partner)
-    {
-        return view('admin.tables.partners.show', compact('partner'));
     }
 
     /**
@@ -107,13 +101,14 @@ class PartnerController extends Controller
         $validatedData['publisher'] = Auth::user()->name;
 
         if ($request->hasFile('logo')) {
-            // Hapus logo lama jika ada dan bukan dari assets (seeder)
+            // Hapus logo lama jika ada dan bukan dari folder assets (foto bawaan/seeder)
             if ($partner->logo && !str_contains($partner->logo, 'assets/img')) {
                 Storage::disk('public')->delete($partner->logo);
             }
 
+            // Simpan logo baru
             $path = $request->file('logo')->store('partner_logos', 'public');
-            $validatedData['logo'] = 'partner_logos/' . basename($path);
+            $validatedData['logo'] = $path;
         }
 
         $partner->update($validatedData);
@@ -126,7 +121,6 @@ class PartnerController extends Controller
      */
     public function destroy(Partner $partner)
     {
-        // Pastikan logo dihapus dari storage agar tidak memenuhi hosting (kecuali logo bawaan seeder)
         if ($partner->logo && !str_contains($partner->logo, 'assets/img')) {
             Storage::disk('public')->delete($partner->logo);
         }

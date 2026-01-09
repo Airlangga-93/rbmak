@@ -19,7 +19,8 @@
 
     {{-- Form Card --}}
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        <form action="{{ route('admin.partners.store') }}" method="POST" enctype="multipart/form-data" class="p-6 md:p-8">
+        {{-- Logika: Enctype wajib ada untuk upload file --}}
+        <form action="{{ route('admin.partners.store') }}" method="POST" enctype="multipart/form-data" class="p-6 md:p-8" id="partnerForm">
             @csrf
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -77,12 +78,17 @@
                         <div class="relative group">
                             <div class="w-full h-48 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center bg-slate-50 group-hover:bg-slate-100 transition-all overflow-hidden relative @error('logo') border-red-300 @enderror">
                                 <i class="fas fa-cloud-upload-alt text-3xl text-slate-300 mb-2 group-hover:text-[#FF8C00] transition-colors"></i>
-                                <span class="text-xs text-slate-400 font-medium">Klik untuk upload logo (PNG/JPG)</span>
+                                <span class="text-xs text-slate-400 font-medium">Klik untuk upload logo (PNG/JPG/WEBP)</span>
+
+                                {{-- Input File: Ditambahkan atribut accept untuk membatasi tipe file di browser --}}
                                 <input type="file" name="logo" id="logo" onchange="previewImage(this)"
-                                    class="absolute inset-0 opacity-0 cursor-pointer z-10" required>
+                                    class="absolute inset-0 opacity-0 cursor-pointer z-10" required
+                                    accept="image/png, image/jpeg, image/jpg, image/svg+xml, image/webp">
+
                                 <img id="imgPreview" class="absolute inset-0 w-full h-full object-contain p-4 bg-white hidden z-0">
                             </div>
                         </div>
+                        <p class="text-[10px] text-slate-400 mt-1 italic text-center lg:text-left">Max size: 2MB. Format: PNG, JPG, SVG, WEBP.</p>
                         @error('logo') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
@@ -101,29 +107,53 @@
                     <i class="fas fa-info-circle mr-2"></i>
                     Pastikan logo customer memiliki background transparan untuk hasil terbaik.
                 </div>
-                <button type="submit"
+                <button type="submit" id="submitBtn"
                     class="w-full md:w-auto px-10 py-3.5 bg-[#FF8C00] text-white rounded-xl font-bold shadow-lg shadow-orange-500/30 hover:bg-[#e67e00] active:scale-95 transition-all flex items-center justify-center">
-                    <i class="fas fa-plus-circle mr-2"></i>
-                    Simpan Customer Baru
+                    <i class="fas fa-plus-circle mr-2" id="btnIcon"></i>
+                    <span id="btnText">Simpan Customer Baru</span>
                 </button>
             </div>
         </form>
     </div>
 </div>
 
-{{-- Preview Image Script --}}
+{{-- Preview Image Script & Loading Handler --}}
 <script>
     function previewImage(input) {
         const preview = document.getElementById('imgPreview');
         if (input.files && input.files[0]) {
+            const file = input.files[0];
+
+            // Validasi tipe file di sisi klien
+            if (!file.type.match('image.*')) {
+                alert("Harap pilih file gambar!");
+                input.value = "";
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 preview.src = e.target.result;
                 preview.classList.remove('hidden');
             }
-            reader.readAsDataURL(input.files[0]);
+            reader.readAsDataURL(file);
         }
     }
+
+    // Menangani Loading saat submit agar tidak double click
+    const form = document.getElementById('partnerForm');
+    const btn = document.getElementById('submitBtn');
+    const btnText = document.getElementById('btnText');
+    const btnIcon = document.getElementById('btnIcon');
+
+    form.addEventListener('submit', function() {
+        if(form.checkValidity()) {
+            btn.classList.add('opacity-80', 'cursor-not-allowed');
+            btnIcon.classList.add('fa-spinner', 'fa-spin');
+            btnIcon.classList.remove('fa-plus-circle');
+            btnText.textContent = 'Memproses...';
+        }
+    });
 </script>
 
 <style>
@@ -133,6 +163,11 @@
         background-position: right 1rem center;
         background-repeat: no-repeat;
         background-size: 1.5em 1.5em;
+    }
+
+    /* Animasi kelancaran preview */
+    #imgPreview {
+        transition: opacity 0.3s ease-in-out;
     }
 </style>
 @endsection
