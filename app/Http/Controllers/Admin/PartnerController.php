@@ -56,17 +56,27 @@ class PartnerController extends Controller
         $validatedData['publisher'] = Auth::user()->name;
 
         if ($request->hasFile('logo')) {
-            // Kita simpan file ke folder 'partner_logos' di disk 'public'
-            $path = $request->file('logo')->store('partner_logos', 'public');
+            $file = $request->file('logo');
+            $fileName = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
 
-            // PERBAIKAN: Kita simpan path lengkap agar di Blade cukup panggil asset('storage/' . $partner->logo)
-            // Hasil simpan di DB: "partner_logos/namafile.jpg"
-            $validatedData['logo'] = $path;
+            // Menggunakan move() ke jalur absolut storage untuk memastikan file terunggah di Hostinger
+            $file->move(base_path('../storage/app/public/partner_logos'), $fileName);
+
+            // Simpan path relatif untuk database
+            $validatedData['logo'] = 'partner_logos/' . $fileName;
         }
 
         Partner::create($validatedData);
 
         return redirect()->route('admin.partners.index')->with('success', '✅ Mitra industri berhasil ditambahkan!');
+    }
+
+    /**
+     * Menampilkan detail mitra.
+     */
+    public function show(Partner $partner)
+    {
+        return view('admin.tables.partners.show', compact('partner'));
     }
 
     /**
@@ -101,14 +111,20 @@ class PartnerController extends Controller
         $validatedData['publisher'] = Auth::user()->name;
 
         if ($request->hasFile('logo')) {
-            // Hapus logo lama jika ada dan bukan dari folder assets (foto bawaan/seeder)
+            // Hapus logo lama jika ada dan bukan dari assets (seeder)
             if ($partner->logo && !str_contains($partner->logo, 'assets/img')) {
-                Storage::disk('public')->delete($partner->logo);
+                $oldPath = base_path('../storage/app/public/' . $partner->logo);
+                if (file_exists($oldPath)) {
+                    unlink($oldPath);
+                }
             }
 
-            // Simpan logo baru
-            $path = $request->file('logo')->store('partner_logos', 'public');
-            $validatedData['logo'] = $path;
+            $file = $request->file('logo');
+            $fileName = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+
+            // Gunakan move() kembali untuk konsistensi di server
+            $file->move(base_path('../storage/app/public/partner_logos'), $fileName);
+            $validatedData['logo'] = 'partner_logos/' . $fileName;
         }
 
         $partner->update($validatedData);
@@ -122,7 +138,10 @@ class PartnerController extends Controller
     public function destroy(Partner $partner)
     {
         if ($partner->logo && !str_contains($partner->logo, 'assets/img')) {
-            Storage::disk('public')->delete($partner->logo);
+            $oldPath = base_path('../storage/app/public/' . $partner->logo);
+            if (file_exists($oldPath)) {
+                unlink($oldPath);
+            }
         }
 
         $partner->delete();
