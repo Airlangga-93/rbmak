@@ -5,13 +5,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+
     <link rel="icon" type="image/png" href="{{ asset('assets/img/image.png') }}?v=1.0">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/image.png') }}?v=1.0">
 
     <title>@yield('title', 'PT RIZQALLAH BOER MAKMUR')</title>
-    
-    </head>
+
+</head>
 
 @section('content')
 
@@ -99,36 +99,35 @@
             class="fixed inset-0 z-[110] flex items-center justify-center p-4">
 
             {{-- OVERLAY --}}
-            <div @click="closeAll()" 
-                 class="fixed inset-0 bg-[#161f36]/60 backdrop-blur-sm transition-opacity">
+            <div @click="closeAll()" class="fixed inset-0 bg-[#161f36]/60 backdrop-blur-sm transition-opacity">
             </div>
 
             {{-- MODAL CARD --}}
             <div class="relative w-full max-w-md">
                 @foreach ($latestNews as $index => $news)
-                    <div x-show="currentIndex === {{ $index }}" 
-                         x-transition:enter="transition ease-out duration-500"
-                         x-transition:enter-start="opacity-0 scale-90 translate-y-8"
-                         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                         class="bg-white rounded-[32px] shadow-2xl overflow-hidden border border-white/20">
+                    <div x-show="currentIndex === {{ $index }}" x-transition:enter="transition ease-out duration-500"
+                        x-transition:enter-start="opacity-0 scale-90 translate-y-8"
+                        x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                        class="bg-white rounded-[32px] shadow-2xl overflow-hidden border border-white/20">
 
                         {{-- IMAGE --}}
                         <div class="relative h-60 bg-gray-100">
                             @if (!empty($news->image))
                                 <img src="{{ asset('storage/' . $news->image) }}" alt="{{ $news->title }}"
-                                     class="w-full h-full object-cover">
+                                    class="w-full h-full object-cover">
                             @endif
 
                             {{-- CLOSE BUTTON --}}
                             <button @click="closeAll()"
-                                    class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-white/90 text-gray-800 hover:bg-red-500 hover:text-white transition-all shadow-lg">
+                                class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-white/90 text-gray-800 hover:bg-red-500 hover:text-white transition-all shadow-lg">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
 
                             {{-- PROGRESS BARS --}}
                             <div class="absolute bottom-4 left-6 flex gap-2">
                                 @for ($i = 0; $i < $latestNews->count(); $i++)
-                                    <div class="h-1.5 rounded-full transition-all duration-500
+                                    <div
+                                        class="h-1.5 rounded-full transition-all duration-500
                                         {{ $i === $index ? 'w-10 bg-[#FF7518]' : 'w-2 bg-white/50' }}">
                                     </div>
                                 @endfor
@@ -137,7 +136,8 @@
 
                         {{-- CONTENT --}}
                         <div class="p-8">
-                            <span class="px-2 py-0.5 rounded bg-orange-50 text-[10px] font-bold text-[#FF7518] tracking-widest uppercase">
+                            <span
+                                class="px-2 py-0.5 rounded bg-orange-50 text-[10px] font-bold text-[#FF7518] tracking-widest uppercase">
                                 Update Terbaru
                             </span>
 
@@ -151,11 +151,12 @@
 
                             <div class="flex items-center justify-between border-t border-gray-100 pt-5">
                                 <a href="{{ route('news.show', $news->slug ?? $news->id) }}"
-                                   class="inline-flex items-center gap-2 text-sm font-bold text-[#FF7518] hover:gap-3 transition-all">
+                                    class="inline-flex items-center gap-2 text-sm font-bold text-[#FF7518] hover:gap-3 transition-all">
                                     Baca Selengkapnya <i class="fa-solid fa-arrow-right-long"></i>
                                 </a>
 
-                                <button @click="next()" class="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] hover:text-[#161f36] transition-colors">
+                                <button @click="next()"
+                                    class="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] hover:text-[#161f36] transition-colors">
                                     {{ $index + 1 === $latestNews->count() ? 'Selesai' : 'Lanjut' }}
                                 </button>
                             </div>
@@ -205,7 +206,8 @@
             {{-- CARD --}}
             <div class="relative w-full max-w-md">
                 @foreach ($latestNews as $index => $news)
-                    <div x-show="currentIndex === {{ $index }}" x-transition:enter="transition ease-out duration-500"
+                    <div x-show="currentIndex === {{ $index }}"
+                        x-transition:enter="transition ease-out duration-500"
                         x-transition:enter-start="opacity-0 scale-90 translate-y-6"
                         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                         class="bg-white rounded-[28px] shadow-2xl overflow-hidden">
@@ -455,7 +457,7 @@
     </section>
 
 
-{{-- ================= INTELLIGENT SOLUTION ================= --}}
+    {{-- ================= INTELLIGENT SOLUTION ================= --}}
     <section class="max-w-7xl mx-auto px-6 lg:px-12 mb-40 reveal">
 
         {{-- Header --}}
@@ -499,7 +501,8 @@
                     <a href="{{ Route::has('products') ? route('products') : '/products' }}"
                         class="group inline-flex items-center justify-center px-8 py-4 rounded-xl bg-[#161f36] text-white font-semibold transition-all duration-300 hover:bg-[#FF7518] hover:shadow-lg hover:shadow-orange-500/30">
                         <span>LIHAT KATALOG</span>
-                        <span class="ml-4 p-2 rounded-lg bg-white/20 group-hover:bg-white group-hover:text-[#FF7518] transition">
+                        <span
+                            class="ml-4 p-2 rounded-lg bg-white/20 group-hover:bg-white group-hover:text-[#FF7518] transition">
                             <i class="fas fa-arrow-right text-sm"></i>
                         </span>
                     </a>
@@ -517,9 +520,15 @@
                 @php
                     // Gabungkan data Produk, Layanan, dan Fasilitas
                     $combined = collect();
-                    if (isset($products)) $combined = $combined->concat($products);
-                    if (isset($services)) $combined = $combined->concat($services);
-                    if (isset($facilities)) $combined = $combined->concat($facilities);
+                    if (isset($products)) {
+                        $combined = $combined->concat($products);
+                    }
+                    if (isset($services)) {
+                        $combined = $combined->concat($services);
+                    }
+                    if (isset($facilities)) {
+                        $combined = $combined->concat($facilities);
+                    }
 
                     // Ambil cadangan dari Gallery jika data utama kurang dari 5
                     if ($combined->count() < 5 && isset($sliderGallery)) {
@@ -528,14 +537,14 @@
 
                     // Ambil tepat 5 item
                     $displayItems = $combined->take(5);
-                    
+
                     // Fallback gambar default jika benar-benar kosong
                     $placeholders = [
                         'https://images.unsplash.com/photo-1520640193369-2213303b19cd?w=800',
                         'https://images.unsplash.com/photo-1544724569-5f546fd6f2b5?w=800',
                         'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800',
                         'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800',
-                        'https://images.unsplash.com/photo-1454165833467-03869c9b4611?w=800'
+                        'https://images.unsplash.com/photo-1454165833467-03869c9b4611?w=800',
                     ];
                 @endphp
 
@@ -543,10 +552,10 @@
                     @php
                         $item = $displayItems->get($i);
                         $gridClass = $i === 0 ? 'md:row-span-2' : ($i === 1 ? 'md:col-span-2 md:row-span-2' : '');
-                        
+
                         // Logika Penanganan Gambar yang diperkuat
                         $finalUrl = $placeholders[$i]; // Set default ke placeholder dulu
-                        
+
                         if ($item) {
                             if (isset($item->image) && !empty($item->image)) {
                                 $path = ltrim($item->image, '/');
@@ -561,18 +570,19 @@
                         }
                     @endphp
 
-                    <div class="{{ $gridClass }} relative overflow-hidden rounded-2xl bg-[#161f36] group border border-transparent hover:border-[#FF7518] transition-all duration-500 shadow-lg">
-                        
+                    <div
+                        class="{{ $gridClass }} relative overflow-hidden rounded-2xl bg-[#161f36] group border border-transparent hover:border-[#FF7518] transition-all duration-500 shadow-lg">
+
                         {{-- Menampilkan Gambar --}}
-                        <img src="{{ $finalUrl }}" 
-                             alt="RBM Infrastructure"
-                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100"
-                             onerror="this.onerror=null;this.src='{{ $placeholders[$i] }}';">
+                        <img src="{{ $finalUrl }}" alt="RBM Infrastructure"
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100"
+                            onerror="this.onerror=null;this.src='{{ $placeholders[$i] }}';">
 
                         {{-- Overlay Info --}}
-                        <div class="absolute inset-0 bg-gradient-to-t from-[#161f36] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-5">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-[#161f36] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-5">
                             <span class="text-[#FF7518] text-[9px] font-bold uppercase tracking-widest mb-1">
-                                @if($item && isset($item->name))
+                                @if ($item && isset($item->name))
                                     {{ isset($item->category_id) ? 'Produk' : 'Infrastructure' }}
                                 @else
                                     RBM Project
@@ -581,12 +591,14 @@
                             <h4 class="text-white text-xs font-bold uppercase leading-tight">
                                 {{ $item->name ?? ($item->title ?? 'Tower Infrastructure') }}
                             </h4>
-                            <div class="w-0 group-hover:w-full h-[2px] bg-[#FF7518] mt-3 transition-all duration-500"></div>
+                            <div class="w-0 group-hover:w-full h-[2px] bg-[#FF7518] mt-3 transition-all duration-500">
+                            </div>
                         </div>
 
                         {{-- Link Detail --}}
-                        @if($item)
-                            <a href="{{ isset($item->slug) ? url('/products/'.$item->slug) : '#' }}" class="absolute inset-0 z-10"></a>
+                        @if ($item)
+                            <a href="{{ isset($item->slug) ? url('/products/' . $item->slug) : '#' }}"
+                                class="absolute inset-0 z-10"></a>
                         @endif
                     </div>
                 @endfor
@@ -1236,9 +1248,11 @@
                                 <p class="text-xs text-[#282829] font-medium leading-tight">Jl. Cilembu Haurngombong<br>
                                     ( Perempatan Warung Kawat ) RT.01, RW.03 Kec. Pamulihan Sumedang 45365</p>
                             </div>
-                            <a href="https://maps.app.goo.gl/..." target="_blank"
-                                class="shrink-0 px-6 py-3 bg-[#161f36] text-white text-xs font-bold rounded-xl hover:bg-[#FF7518] transition-all">Buka
-                                di Maps</a>
+                            <a href="https://www.google.com/maps/search/?api=1&query=-6.9113491,107.8323199"
+                                target="_blank"
+                                class="shrink-0 px-6 py-3 bg-[#161f36] text-white text-xs font-bold rounded-xl hover:bg-[#FF7518] transition-all">
+                                Buka di Maps
+                            </a>
                         </div>
                     </div>
                 </div>
