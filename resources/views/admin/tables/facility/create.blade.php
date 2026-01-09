@@ -35,6 +35,7 @@
         position: relative;
         color: transparent !important;
         pointer-events: none;
+        opacity: 0.8;
     }
     .btn-loading::after {
         content: "";
@@ -70,6 +71,7 @@
         </div>
 
         {{-- Form Tambah Fasilitas --}}
+        {{-- Logika: Action diarahkan ke store, method POST, dan wajib enctype untuk file upload --}}
         <form action="{{ route('admin.facilities.store') }}" method="POST" enctype="multipart/form-data" id="facilityForm">
             @csrf
 
@@ -90,16 +92,17 @@
                 <div class="relative">
                     <input type="file" name="image" id="image" required
                         class="w-full border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-accent-tower focus:border-accent-tower transition @error('image') border-red-500 @enderror"
-                        accept="image/*"
+                        accept="image/png, image/jpeg, image/jpg, image/webp"
                         onchange="previewImage(event)">
                 </div>
                 <p class="text-gray-400 text-[10px] mt-1 italic">Format: JPG, PNG, WEBP. Maksimal 2MB.</p>
                 @error('image')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
+
                 {{-- Preview Area --}}
                 <div id="imagePreviewContainer" class="hidden mt-3">
-                    <img id="imgPreview" src="#" alt="Preview" class="h-32 rounded-lg shadow-md border border-gray-200">
+                    <img id="imgPreview" src="#" alt="Preview" class="h-32 rounded-lg shadow-md border border-gray-200 object-cover">
                 </div>
             </div>
 
@@ -107,7 +110,7 @@
             <div class="mb-5">
                 <label for="description" class="block text-sm font-medium text-dark-tower mb-1">Deskripsi <span class="text-red-500">*</span></label>
                 <textarea name="description" id="description" rows="5" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-tower focus:border-accent-tower transition @error('description') border-red-500 @enderror" 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-tower focus:border-accent-tower transition @error('description') border-red-500 @enderror"
                     placeholder="Jelaskan detail dan fungsi fasilitas...">{{ old('description') }}</textarea>
                 @error('description')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -119,8 +122,8 @@
                 <label for="type" class="block text-sm font-medium text-dark-tower mb-1">Jenis Fasilitas <span class="text-red-500">*</span></label>
                 <select name="type" id="type" required
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-tower focus:border-accent-tower transition @error('type') border-red-500 @enderror">
-                    <option value="" disabled selected>Pilih Jenis Fasilitas</option>
-                    <option value="Peralatan Pabrikas" {{ old('type') == 'Peralatan Pabrikas' ? 'selected' : '' }}>Peralatan Pabrikas</option>
+                    <option value="" disabled {{ old('type') ? '' : 'selected' }}>Pilih Jenis Fasilitas</option>
+                    <option value="Peralatan Pabrikasi" {{ old('type') == 'Peralatan Pabrikasi' ? 'selected' : '' }}>Peralatan Pabrikasi</option>
                     <option value="Peralatan Maintenance" {{ old('type') == 'Peralatan Maintenance' ? 'selected' : '' }}>Peralatan Maintenance</option>
                     <option value="Kendaraan Operasional" {{ old('type') == 'Kendaraan Operasional' ? 'selected' : '' }}>Kendaraan Operasional</option>
                 </select>
@@ -133,7 +136,7 @@
             <div class="flex items-center justify-end pt-4 border-t border-gray-200">
                 <button type="submit" id="submitBtn"
                     class="bg-accent-tower text-white px-8 py-2 rounded-lg font-semibold hover:bg-accent-dark transition-all duration-200 shadow-md flex items-center">
-                    <i class="fas fa-save mr-2"></i> 
+                    <i class="fas fa-save mr-2" id="btnIcon"></i>
                     <span id="btnText">Simpan Fasilitas</span>
                 </button>
             </div>
@@ -142,27 +145,43 @@
 </div>
 
 <script>
-    // Preview gambar sebelum upload
+    // Preview gambar sebelum upload dengan validasi tipe file
     function previewImage(event) {
+        const file = event.target.files[0];
         const reader = new FileReader();
         const preview = document.getElementById('imgPreview');
         const container = document.getElementById('imagePreviewContainer');
-        
-        reader.onload = function(){
-            preview.src = reader.result;
-            container.classList.remove('hidden');
+
+        if (file) {
+            // Validasi file adalah gambar
+            if (!file.type.match('image.*')) {
+                alert("Harap pilih file gambar!");
+                event.target.value = "";
+                container.classList.add('hidden');
+                return;
+            }
+
+            reader.onload = function(){
+                preview.src = reader.result;
+                container.classList.remove('hidden');
+            }
+            reader.readAsDataURL(file);
         }
-        reader.readAsDataURL(event.target.files[0]);
     }
 
-    // Tambahkan efek loading saat submit untuk mencegah delay visual & double submit
+    // Tambahkan efek loading saat submit
     const form = document.getElementById('facilityForm');
     const btn = document.getElementById('submitBtn');
     const btnText = document.getElementById('btnText');
+    const btnIcon = document.getElementById('btnIcon');
 
-    form.addEventListener('submit', function() {
-        btn.classList.add('btn-loading');
-        btnText.textContent = 'Menyimpan...';
+    form.addEventListener('submit', function(e) {
+        // Validasi HTML5 dijalankan otomatis, jika valid baru masuk sini
+        if (form.checkValidity()) {
+            btn.classList.add('btn-loading');
+            btnIcon.classList.add('hidden'); // Sembunyikan ikon save saat loading
+            btnText.textContent = 'Menyimpan...';
+        }
     });
 </script>
 
