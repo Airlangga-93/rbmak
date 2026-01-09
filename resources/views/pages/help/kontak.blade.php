@@ -95,7 +95,7 @@
                                 </div>
                                 <div>
                                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Project
-                                        Coordinator</p>
+                                        & Operasional</p>
                                     <a href="https://wa.me/6285222331343" target="_blank"
                                         class="text-lg font-bold text-[#2C3E50] hover:text-[#FFC300] transition-colors block leading-tight">
                                         0852 2233 1343
@@ -173,7 +173,7 @@
                                     <span class="text-sm font-semibold text-[#2C3E50] leading-relaxed block">
                                         Menara Palma Lantai 12<br>
                                         Jl. HR. Rasuna Said Kav. 6 Blok X-2<br>
-                                        Jakarta Selatan 12950F
+                                        Jakarta Selatan 12950
                                     </span>
                                 </div>
                             </div>

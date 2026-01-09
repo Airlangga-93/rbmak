@@ -364,14 +364,6 @@
                             Berdedikasi untuk memberikan layanan konstruksi dan suplai material kualitas tinggi di
                             seluruh wilayah Indonesia.
                         </p>
-                        <div class="flex gap-4">
-                            @foreach (['facebook-f', 'instagram', 'linkedin-in', 'youtube'] as $icon)
-                                <a href="#"
-                                    class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-gray-400 hover:text-rbm-accent hover:border-rbm-accent transition-all">
-                                    <i class="fab fa-{{ $icon }} text-base"></i>
-                                </a>
-                            @endforeach
-                        </div>
                     </div>
 
                     <div class="lg:pl-8">
