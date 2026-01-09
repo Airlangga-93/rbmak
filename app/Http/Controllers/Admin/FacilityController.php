@@ -7,12 +7,11 @@ use App\Models\Facility;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class FacilityController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Tampilkan daftar fasilitas.
      */
     public function index()
     {
@@ -21,7 +20,7 @@ class FacilityController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Form tambah fasilitas.
      */
     public function create()
     {
@@ -29,7 +28,7 @@ class FacilityController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Simpan fasilitas baru ke storage.
      */
     public function store(Request $request)
     {
@@ -51,17 +50,19 @@ class FacilityController extends Controller
         $validatedData['publisher'] = Auth::user()->name;
 
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('facility_images', 'public');
-            $validatedData['image'] = $imagePath;
+            // Path: storage/app/public/facility_images
+            // Kita gunakan basename agar yang tersimpan di DB hanya nama filenya saja (konsisten dengan produk)
+            $path = $request->file('image')->store('facility_images', 'public');
+            $validatedData['image'] = 'facility_images/' . basename($path);
         }
 
         Facility::create($validatedData);
 
-        return redirect()->route('admin.facilities.index')->with('success', 'Fasilitas berhasil ditambahkan!');
+        return redirect()->route('admin.facilities.index')->with('success', '✅ Fasilitas berhasil ditambahkan!');
     }
 
     /**
-     * Display the specified resource.
+     * Tampilkan detail fasilitas.
      */
     public function show(Facility $facility)
     {
@@ -69,7 +70,7 @@ class FacilityController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Form edit fasilitas.
      */
     public function edit(Facility $facility)
     {
@@ -77,7 +78,7 @@ class FacilityController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update fasilitas dan hapus foto lama.
      */
     public function update(Request $request, Facility $facility)
     {
@@ -98,31 +99,33 @@ class FacilityController extends Controller
         $validatedData['publisher'] = Auth::user()->name;
 
         if ($request->hasFile('image')) {
-            if ($facility->image) {
+            // Hapus foto lama jika ada di storage public
+            if ($facility->image && Storage::disk('public')->exists($facility->image)) {
                 Storage::disk('public')->delete($facility->image);
             }
-            $imagePath = $request->file('image')->store('facility_images', 'public');
-            $validatedData['image'] = $imagePath;
+
+            // Simpan foto baru
+            $path = $request->file('image')->store('facility_images', 'public');
+            $validatedData['image'] = 'facility_images/' . basename($path);
         }
 
         $facility->update($validatedData);
 
-        return redirect()->route('admin.facilities.index')->with('success', 'Fasilitas berhasil diperbarui!');
+        return redirect()->route('admin.facilities.index')->with('success', '✅ Fasilitas berhasil diperbarui!');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Hapus fasilitas dan file fotonya.
      */
     public function destroy(Facility $facility)
     {
-        if ($facility->image) {
+        // Hapus file fisik agar tidak jadi sampah di Hostinger
+        if ($facility->image && Storage::disk('public')->exists($facility->image)) {
             Storage::disk('public')->delete($facility->image);
         }
 
         $facility->delete();
 
-        return redirect()->route('admin.facilities.index')->with('success', 'Fasilitas berhasil dihapus!');
+        return redirect()->route('admin.facilities.index')->with('success', '🗑️ Fasilitas berhasil dihapus!');
     }
-
-
 }

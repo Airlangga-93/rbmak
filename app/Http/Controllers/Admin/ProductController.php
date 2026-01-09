@@ -42,9 +42,10 @@ class ProductController extends Controller
         $validated['slug'] = $this->createUniqueSlug($validated['name']);
 
         if ($request->hasFile('image')) {
-            // Path: storage/app/public/produk (lebih simple)
+            // Path: storage/app/public/produk
+            // Kita simpan nama filenya saja agar tidak terjadi double folder saat dipanggil di Blade
             $path = $request->file('image')->store('produk', 'public');
-            $validated['image'] = basename($path); 
+            $validated['image'] = basename($path);
         }
 
         Product::create($validated);
@@ -78,11 +79,12 @@ class ProductController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            // Hapus gambar lama jika ada di storage
+            // 1. Hapus gambar lama dari storage agar tidak menumpuk
             if ($product->image && Storage::disk('public')->exists('produk/' . $product->image)) {
                 Storage::disk('public')->delete('produk/' . $product->image);
             }
-            
+
+            // 2. Simpan gambar baru
             $path = $request->file('image')->store('produk', 'public');
             $validated['image'] = basename($path);
         }
@@ -107,9 +109,11 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        // Hapus file fisik di storage sebelum data di database dihapus
         if ($product->image && Storage::disk('public')->exists('produk/' . $product->image)) {
             Storage::disk('public')->delete('produk/' . $product->image);
         }
+
         $product->delete();
         return redirect()->route('admin.products.index')->with('success', '🗑️ Produk berhasil dihapus!');
     }
