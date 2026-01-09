@@ -70,20 +70,20 @@
                                         Marketing</p>
                                     <div class="space-y-4">
                                         <div>
-                                            <a href="https://wa.me/6282121233261" target="_blank"
-                                                class="text-base font-bold text-[#2C3E50] hover:text-[#FFC300] transition-colors block leading-tight">
-                                                0821 2123 3261
-                                            </a>
-                                            <p class="text-xs font-medium text-[#7F8C8D] mt-1 uppercase tracking-tighter">
-                                                Arif Endi</p>
-                                        </div>
-                                        <div>
                                             <a href="https://wa.me/6281394884596" target="_blank"
                                                 class="text-base font-bold text-[#2C3E50] hover:text-[#FFC300] transition-colors block leading-tight">
                                                 0813 9488 4596
                                             </a>
                                             <p class="text-xs font-medium text-[#7F8C8D] mt-1 uppercase tracking-tighter">
                                                 Dwi Yudho M</p>
+                                        </div>
+                                        <div>
+                                            <a href="https://wa.me/6282121233261" target="_blank"
+                                                class="text-base font-bold text-[#2C3E50] hover:text-[#FFC300] transition-colors block leading-tight">
+                                                0821 2123 3261
+                                            </a>
+                                            <p class="text-xs font-medium text-[#7F8C8D] mt-1 uppercase tracking-tighter">
+                                                Arif Endi</p>
                                         </div>
                                     </div>
                                 </div>
