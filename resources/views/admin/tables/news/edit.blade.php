@@ -1,0 +1,140 @@
+@extends('admin.layouts.app')
+
+@section('content')
+    <!DOCTYPE html>
+    <html lang="id">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Edit Berita</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+        <link rel="stylesheet" type="text/css" href="https://unpkg.com/trix@2.0.8/dist/trix.css">
+        <script type="text/javascript" src="https://unpkg.com/trix@2.0.8/dist/trix.umd.min.js"></script>
+        <style>
+            body {
+                font-family: 'Poppins', sans-serif;
+                background-color: #f0f2f5;
+            }
+
+            /* Styling Kustom untuk Trix Editor */
+            trix-toolbar [data-trix-button-group="file-tools"] {
+                display: none;
+                /* Sembunyikan tombol upload file bawaan */
+            }
+
+            trix-editor {
+                background-color: white;
+                min-height: 250px;
+                border-radius: 0.5rem;
+                border-width: 1px;
+                border-color: #D1D5DB;
+            }
+
+            /* Efek focus ring Oranye agar konsisten */
+            trix-editor:focus-within {
+                outline: 2px solid transparent;
+                outline-offset: 2px;
+                border-color: #FF7518;
+                box-shadow: 0 0 0 2px rgba(255, 117, 24, 0.2);
+            }
+
+            /* Style untuk error state */
+            trix-editor.border-red-500 {
+                border-color: #EF4444;
+            }
+        </style>
+    </head>
+
+    <body class="bg-gray-100">
+
+        <div class="main-content flex-1 p-6">
+            <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-[#FF7518]">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 class="text-2xl font-bold text-[#161f36]">Edit Berita</h1>
+                        <p class="text-sm text-gray-500">Perbarui informasi berita yang sudah ada.</p>
+                    </div>
+                    <a href="{{ route('admin.news.index') }}"
+                        class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors duration-200 flex items-center space-x-2">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Kembali</span>
+                    </a>
+                </div>
+
+                <form action="{{ route('admin.news.update', $news) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="mb-4">
+                        <label for="title" class="block text-sm font-semibold text-[#161f36] mb-1">Judul Berita</label>
+                        <input type="text" name="title" id="title"
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF7518] @error('title') border-red-500 @enderror"
+                            value="{{ old('title', $news->title) }}">
+                        @error('title')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="image" class="block text-sm font-semibold text-[#161f36] mb-1">Gambar</label>
+                        <input type="file" name="image" id="image"
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF7518] @error('image') border-red-500 @enderror">
+
+                        @if ($news->image)
+                            <div class="mt-3 p-2 border rounded-lg inline-block bg-gray-50">
+                                <p class="text-[10px] text-gray-500 mb-1 font-bold uppercase">Gambar Saat Ini:</p>
+                                <img src="{{ asset('storage/' . $news->image) }}" alt="Gambar Berita"
+                                    class="w-40 h-auto object-cover rounded shadow-sm border border-gray-200">
+                            </div>
+                        @endif
+
+                        @error('image')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="description" class="block text-sm font-semibold text-[#161f36] mb-1">Deskripsi /
+                            Konten</label>
+
+                        <input id="description" type="hidden" name="description"
+                            value="{{ old('description', $news->description) }}">
+
+                        <trix-editor input="description"
+                            class="@error('description') border-red-500 @enderror"></trix-editor>
+
+                        @error('description')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="date_published" class="block text-sm font-semibold text-[#161f36] mb-1">Tanggal
+                            Publikasi</label>
+                        <input type="date" name="date_published" id="date_published"
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF7518] @error('date_published') border-red-500 @enderror"
+                            value="{{ old('date_published', $news->date_published) }}">
+                        @error('date_published')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="flex items-center justify-end border-t pt-6">
+                        <button type="submit"
+                            class="bg-[#FF7518] text-white px-8 py-2 rounded-lg font-bold hover:bg-[#e66a15] shadow-lg shadow-orange-100 transition-all duration-200 flex items-center">
+                            <i class="fas fa-save mr-2"></i>
+                            Perbarui Berita
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </body>
+
+    </html>
+@endsection
