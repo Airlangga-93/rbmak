@@ -11,18 +11,17 @@ use Illuminate\Support\Facades\Storage;
 class NewsController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Tampilkan daftar berita.
      */
     public function index()
     {
-        // Mengambil semua berita dari database, diurutkan dari yang terbaru
+        // Mengambil semua berita, diurutkan dari yang terbaru
         $news = News::latest()->get();
-
         return view("admin.tables.news.index", compact("news"));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Form tambah berita.
      */
     public function create()
     {
@@ -30,58 +29,61 @@ class NewsController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Simpan berita baru.
      */
     public function store(Request $request)
     {
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
-            'image' => 'required|image|mimes:png,jpg,jpeg|max:5048',
+            'image' => 'required|image|mimes:png,jpg,jpeg,webp|max:5048',
             'description' => 'required|string',
             'date_published' => 'required|date',
+        ], [
+            'title.required' => 'Judul berita wajib diisi.',
+            'image.required' => 'Gambar berita wajib diunggah.',
+            'image.max' => 'Ukuran gambar maksimal 5MB.',
         ]);
 
-        // Mengisi nama penerbit secara otomatis dari user yang login
+        // Mengisi nama penerbit secara otomatis
         $validatedData['publisher'] = Auth::user()->name;
 
-        // Proses upload gambar
+        // Proses upload gambar ke folder: storage/app/public/news_images
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('news_images', 'public');
-            $validatedData['image'] = $imagePath;
+            $path = $request->file('image')->store('news_images', 'public');
+            // Simpan path lengkap agar konsisten dengan pemanggilan di Blade
+            $validatedData['image'] = 'news_images/' . basename($path);
         }
 
-        // Slug akan dibuat otomatis oleh model News melalui static::creating
+        // Slug dibuat otomatis oleh model News
         News::create($validatedData);
 
-        return redirect()->route('admin.news.index')->with('success', 'Berita berhasil ditambahkan!');
+        return redirect()->route('admin.news.index')->with('success', '✅ Berita berhasil ditambahkan!');
     }
 
     /**
-     * Display the specified resource.
+     * Tampilkan detail berita.
      */
     public function show(News $news)
     {
-        // Menggunakan Route Model Binding (otomatis mencari berdasarkan slug)
         return view('admin.tables.news.show', compact('news'));
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Form edit berita.
      */
     public function edit(News $news)
     {
-        // Menggunakan Route Model Binding
         return view('admin.tables.news.edit', compact('news'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update berita dan hapus gambar lama dari server.
      */
     public function update(Request $request, News $news)
     {
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:png,jpg,jpeg|max:5048',
+            'image' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:5048',
             'description' => 'required|string',
             'date_published' => 'required|date',
         ]);
@@ -89,33 +91,33 @@ class NewsController extends Controller
         $validatedData['publisher'] = Auth::user()->name;
 
         if ($request->hasFile('image')) {
-            // Hapus gambar lama jika ada gambar baru yang diupload
-            if ($news->image) {
+            // Hapus gambar lama dari storage Hostinger jika ada
+            if ($news->image && Storage::disk('public')->exists($news->image)) {
                 Storage::disk('public')->delete($news->image);
             }
 
-            $imagePath = $request->file('image')->store('news_images', 'public');
-            $validatedData['image'] = $imagePath;
+            // Simpan gambar baru
+            $path = $request->file('image')->store('news_images', 'public');
+            $validatedData['image'] = 'news_images/' . basename($path);
         }
 
-        // Slug akan diupdate otomatis oleh model jika title berubah (isDirty)
         $news->update($validatedData);
 
-        return redirect()->route('admin.news.index')->with('success', 'Berita berhasil diperbarui!');
+        return redirect()->route('admin.news.index')->with('success', '✅ Berita berhasil diperbarui!');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Hapus berita dan file gambarnya secara permanen.
      */
     public function destroy(News $news)
     {
-        // Hapus file gambar dari storage sebelum menghapus data di database
-        if ($news->image) {
+        // Bersihkan storage agar tidak penuh dengan gambar sampah
+        if ($news->image && Storage::disk('public')->exists($news->image)) {
             Storage::disk('public')->delete($news->image);
         }
 
         $news->delete();
 
-        return redirect()->route('admin.news.index')->with('success', 'Berita berhasil dihapus.');
+        return redirect()->route('admin.news.index')->with('success', '🗑️ Berita berhasil dihapus!');
     }
 }
