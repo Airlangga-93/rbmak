@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Artisan; // Ditambahkan untuk utilitas
 use Illuminate\Http\Request;
 
 // Auth Controllers
@@ -162,7 +163,6 @@ Route::prefix('booking')->group(function () {
         Route::post('/riwayat/store', [BookingAuthController::class, 'storeBooking'])->name('booking.riwayat.store');
 
         // --- CHAT SYSTEM ROUTES (USER) ---
-        // Route ini dipanggil oleh JavaScript fetch() di halaman chat user
         Route::get('/chat', [BookingAuthController::class, 'chat'])->name('chat.index');
         Route::post('/chat/send', [BookingAuthController::class, 'sendChat'])->name('chat.send');
         Route::delete('/chat/message/{id}', [BookingAuthController::class, 'deleteMessage'])->name('chat.delete');
@@ -201,11 +201,8 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // --- CHAT SYSTEM ADMIN ---
-    // Endpoint untuk melihat chat spesifik user
     Route::get('/booking/chat/{user_id}', [AdminBookingController::class, 'chat'])->name('booking.chat');
-    // Endpoint pengiriman pesan oleh admin
     Route::post('/booking/chat/send', [AdminBookingController::class, 'sendChat'])->name('chat.send');
-    // Perbaikan: Route delete/update harus mengarah ke controller yang menangani logic admin
     Route::delete('/booking/chat/message/{id}', [AdminBookingController::class, 'deleteMessage'])->name('chat.delete');
     Route::put('/booking/chat/update/{id}', [AdminBookingController::class, 'updateMessage'])->name('chat.update');
 
@@ -232,7 +229,37 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 });
 
 
-// ==================== 4. UTILITIES ====================
+// ==================== 4. UTILITIES & FIXES ====================
+
+/**
+ * Route khusus untuk memperbaiki storage:link di Hostinger
+ * Akses: domainanda.com/foo-link
+ */
+Route::get('/foo-link', function () {
+    $target = storage_path('app/public');
+    $link = public_path('storage');
+
+    // Hapus jika sudah ada folder/symlink lama agar tidak conflict
+    if (file_exists($link)) {
+        // Gunakan command sistem untuk menghapus direktori/link di Linux
+        shell_exec('rm -rf ' . escapeshellarg($link));
+    }
+
+    try {
+        // Laravel Filesystem Link (Cara Bersih)
+        app('files')->link($target, $link);
+        return "Link Storage Berhasil Dibuat! Silakan cek kembali gambar Anda.";
+    } catch (\Exception $e) {
+        // Fallback jika symlink() PHP di-disable, gunakan perintah shell Linux
+        $command = 'ln -s ' . escapeshellarg($target) . ' ' . escapeshellarg($link);
+        shell_exec($command);
+        return "Link dibuat via Shell Command. Cek hasil: " . (file_exists($link) ? 'Sukses' : 'Gagal');
+    }
+});
+
+/**
+ * Route Fallback untuk storage lokal jika symlink belum sempurna
+ */
 Route::get('storage/{path}', function ($path) {
     $storagePath = storage_path('app/public/' . $path);
     if (!Storage::disk('public')->exists($path)) abort(404);
