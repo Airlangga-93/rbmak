@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Artisan; // Ditambahkan untuk utilitas
 use Illuminate\Http\Request;
 
 // Auth Controllers
@@ -229,36 +228,34 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 });
 
 
-// ==================== 4. UTILITIES & FIXES ====================
+// ==================== 4. STORAGE SYMLINK FIX ====================
 
 /**
  * Route khusus untuk memperbaiki storage:link di Hostinger
  * Akses: domainanda.com/foo-link
  */
 Route::get('/foo-link', function () {
-    $target = storage_path('app/public');
+    $target = base_path('storage/app/public');
     $link = public_path('storage');
 
-    // Hapus jika sudah ada folder/symlink lama agar tidak conflict
-    if (file_exists($link)) {
-        // Gunakan command sistem untuk menghapus direktori/link di Linux
-        shell_exec('rm -rf ' . escapeshellarg($link));
+    // Hapus manual folder 'storage' di public_html jika ada (ikon folder biasa bukan shortcut)
+    if (file_exists($link) && !is_link($link)) {
+        app('files')->deleteDirectory($link);
     }
 
     try {
-        // Laravel Filesystem Link (Cara Bersih)
-        app('files')->link($target, $link);
-        return "Link Storage Berhasil Dibuat! Silakan cek kembali gambar Anda.";
+        if (symlink($target, $link)) {
+            return "BERHASIL! Link storage sudah aktif.";
+        } else {
+            return "GAGAL! symlink() PHP tidak diizinkan oleh server.";
+        }
     } catch (\Exception $e) {
-        // Fallback jika symlink() PHP di-disable, gunakan perintah shell Linux
-        $command = 'ln -s ' . escapeshellarg($target) . ' ' . escapeshellarg($link);
-        shell_exec($command);
-        return "Link dibuat via Shell Command. Cek hasil: " . (file_exists($link) ? 'Sukses' : 'Gagal');
+        return "ERROR: " . $e->getMessage();
     }
 });
 
 /**
- * Route Fallback untuk storage lokal jika symlink belum sempurna
+ * Fallback Route jika akses gambar masih bermasalah
  */
 Route::get('storage/{path}', function ($path) {
     $storagePath = storage_path('app/public/' . $path);
