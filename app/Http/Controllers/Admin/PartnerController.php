@@ -57,12 +57,17 @@ class PartnerController extends Controller
 
         Partner::create($data);
 
-        return redirect()->route('admin.partners.index')->with('success', '✅ Customer berhasil ditambahkan!');
+        return redirect()->route('admin.partners.index')->with('success', ' Customer berhasil ditambahkan!');
     }
 
     public function edit(Partner $partner)
     {
         return view('admin.tables.partners.edit', compact('partner'));
+    }
+
+    public function show(Partner $partner)
+    {
+        return view('admin.tables.partners.show', compact('partner'));
     }
 
     public function update(Request $request, Partner $partner)
@@ -96,7 +101,7 @@ class PartnerController extends Controller
 
         $partner->update($data);
 
-        return redirect()->route('admin.partners.index')->with('success', '✅ Customer berhasil diperbarui!');
+        return redirect()->route('admin.partners.index')->with('success', ' Customer berhasil diperbarui!');
     }
 
     public function destroy(Partner $partner)
@@ -107,6 +112,6 @@ class PartnerController extends Controller
         }
 
         $partner->delete();
-        return redirect()->route('admin.partners.index')->with('success', '🗑️ Customer berhasil dihapus!');
+        return redirect()->route('admin.partners.index')->with('success', ' Customer berhasil dihapus!');
     }
 }

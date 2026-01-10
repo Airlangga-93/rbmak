@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Gallery;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class GalleryController extends Controller
 {
@@ -31,29 +32,35 @@ class GalleryController extends Controller
      */
     public function store(Request $request)
     {
-        // Validasi title dan image
+        // Validasi diperketat: max 2MB agar tidak loading lama saat buka index
         $request->validate([
             'title' => 'required|string|max:255',
-            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:4096',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
         ], [
             'title.required' => 'Judul galeri harus diisi.',
             'image.required' => 'Foto harus diunggah.',
-            'image.max' => 'Ukuran foto maksimal 4MB.'
+            'image.max' => 'Ukuran foto maksimal 2MB agar website tetap cepat.'
         ]);
 
-        // Simpan ke folder: storage/app/public/gallery
-        $path = $request->file('image')->store('gallery', 'public');
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            // Membuat nama file unik agar tidak terjadi tabrakan nama di folder gallery
+            $fileName = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
 
-        Gallery::create([
-            'title' => $request->title,
-            'image' => $path, // Menyimpan path lengkap: gallery/namafile.jpg
-        ]);
+            // Simpan ke: storage/app/public/gallery
+            $path = $file->storeAs('gallery', $fileName, 'public');
+
+            Gallery::create([
+                'title' => $request->title,
+                'image' => $path, // Hasil di DB: "gallery/namafile.jpg"
+            ]);
+        }
 
         return redirect()->route('admin.galleries.index')->with('success', '✅ Galeri berhasil ditambahkan!');
     }
 
     /**
-     * Tampilkan detail galeri (Opsional).
+     * Tampilkan detail galeri.
      */
     public function show(Gallery $gallery)
     {
@@ -69,30 +76,36 @@ class GalleryController extends Controller
     }
 
     /**
-     * Update galeri dan bersihkan file lama di server.
+     * Update galeri dan bersihkan file lama.
      */
     public function update(Request $request, Gallery $gallery)
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         $gallery->title = $request->title;
 
         if ($request->hasFile('image')) {
-            // Hapus file fisik lama dari storage Hostinger
-            if ($gallery->image && Storage::disk('public')->exists($gallery->image)) {
-                Storage::disk('public')->delete($gallery->image);
+            // 1. Hapus file fisik lama jika bukan file bawaan assets
+            if ($gallery->image && !str_contains($gallery->image, 'assets/')) {
+                if (Storage::disk('public')->exists($gallery->image)) {
+                    Storage::disk('public')->delete($gallery->image);
+                }
             }
 
-            // Simpan file baru
-            $gallery->image = $request->file('image')->store('gallery', 'public');
+            // 2. Simpan file baru
+            $file = $request->file('image');
+            $fileName = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('gallery', $fileName, 'public');
+
+            $gallery->image = $path;
         }
 
         $gallery->save();
 
-        return redirect()->route('admin.galleries.index')->with('success', '✅ Galeri berhasil diperbarui!');
+        return redirect()->route('admin.galleries.index')->with('success', ' Galeri berhasil diperbarui!');
     }
 
     /**
@@ -100,12 +113,14 @@ class GalleryController extends Controller
      */
     public function destroy(Gallery $gallery)
     {
-        // Pastikan file fisik dihapus agar kapasitas hosting tetap lega
-        if ($gallery->image && Storage::disk('public')->exists($gallery->image)) {
-            Storage::disk('public')->delete($gallery->image);
+        // Pastikan file fisik dihapus agar storage lokal/hosting tidak bengkak
+        if ($gallery->image && !str_contains($gallery->image, 'assets/')) {
+            if (Storage::disk('public')->exists($gallery->image)) {
+                Storage::disk('public')->delete($gallery->image);
+            }
         }
 
         $gallery->delete();
-        return redirect()->route('admin.galleries.index')->with('success', '🗑️ Galeri berhasil dihapus!');
+        return redirect()->route('admin.galleries.index')->with('success', ' Galeri berhasil dihapus!');
     }
 }

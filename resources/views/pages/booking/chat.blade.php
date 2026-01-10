@@ -1,22 +1,14 @@
 @extends('layouts.booking')
 
-@section('title', 'Customer Chat Console')
+@section('title', 'Customer Chat Console - PT RBM')
 
 @section('styles')
     <style>
-        [x-cloak] {
-            display: none !important;
-        }
+        [x-cloak] { display: none !important; }
 
         /* Custom Scrollbar */
-        .chat-container::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        .chat-container::-webkit-scrollbar-thumb {
-            background: #e2e8f0;
-            border-radius: 10px;
-        }
+        .chat-container::-webkit-scrollbar { width: 4px; }
+        .chat-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
         #chatBox {
             scroll-behavior: smooth;
@@ -26,107 +18,100 @@
         }
 
         /* Message Animations */
-        .message-in {
-            animation: slideUp 0.3s ease-out forwards;
-        }
-
+        .message-in { animation: slideUp 0.3s ease-out forwards; }
         @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .glass-header {
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
         }
+
+        /* Responsive height fix */
+        .chat-wrapper { height: calc(100vh - 80px); }
+        @media (max-width: 1024px) {
+            .chat-wrapper { height: calc(100vh - 120px); }
+        }
     </style>
 @endsection
 
 @section('content')
-    <div class="max-w-7xl mx-auto h-[88vh] my-4 px-4" x-data="chatSystem()">
-        <div class="grid grid-cols-12 gap-6 h-full">
+    <div class="max-w-7xl mx-auto chat-wrapper px-2 md:px-4" x-data="chatSystem()">
+        <div class="grid grid-cols-12 gap-4 md:gap-6 h-full">
 
             {{-- MAIN CHAT AREA --}}
-            <div class="col-span-12 lg:col-span-8 bg-white border border-slate-200 rounded-[32px] shadow-sm flex flex-col overflow-hidden relative">
+            <div class="col-span-12 lg:col-span-8 bg-white border border-slate-200 rounded-[24px] md:rounded-[32px] shadow-sm flex flex-col overflow-hidden relative h-full">
 
                 {{-- HEADER --}}
-                <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between glass-header sticky top-0 z-20">
-                    <div class="flex items-center gap-4">
+                <div class="px-4 md:px-6 py-3 md:py-4 border-b border-slate-100 flex items-center justify-between glass-header sticky top-0 z-20">
+                    <div class="flex items-center gap-3 md:gap-4">
                         <div class="relative">
-                            <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 border border-blue-100">
-                                <i class="fa-solid fa-building-shield text-xl"></i>
+                            <div class="w-10 h-10 md:w-12 md:h-12 bg-blue-50 rounded-xl md:rounded-2xl flex items-center justify-center text-blue-600 border border-blue-100">
+                                <i class="fa-solid fa-building-shield text-lg md:text-xl"></i>
                             </div>
                             <div :class="isOnline ? 'bg-green-500' : 'bg-slate-300'"
-                                class="absolute -bottom-1 -right-1 w-4 h-4 border-4 border-white rounded-full transition-colors duration-500">
+                                class="absolute -bottom-1 -right-1 w-3.5 h-3.5 border-2 border-white rounded-full transition-colors duration-500">
                             </div>
                         </div>
                         <div>
                             <div class="flex items-center gap-2">
-                                <h3 class="font-bold text-slate-800">Admin Rizqallah</h3>
+                                <h3 class="font-bold text-slate-800 text-sm md:text-base">Admin Rizqallah</h3>
                                 <span x-show="isOnline" class="flex h-2 w-2 rounded-full bg-green-500"></span>
                             </div>
-                            <p class="text-[11px] text-slate-500 font-medium tracking-wide"
+                            <p class="text-[10px] md:text-[11px] text-slate-500 font-medium tracking-wide"
                                 x-text="isOnline ? 'Petugas tersedia' : 'Offline'"></p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <a href="{{ route('booking.index') }}"
-                            class="text-slate-400 hover:text-slate-600 p-2 transition-colors">
-                            <i class="fa-solid fa-arrow-left-long text-lg"></i>
+                    <div class="flex items-center gap-2 md:gap-4">
+                         <a href="{{ route('booking.riwayat') }}" class="text-slate-400 hover:text-slate-600 p-2">
+                            <i class="fa-solid fa-circle-info text-lg"></i>
                         </a>
                     </div>
                 </div>
 
                 {{-- MESSAGES BOX --}}
-                <div id="chatBox" class="flex-1 overflow-y-auto p-6 space-y-6 chat-container">
+                <div id="chatBox" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6 chat-container">
                     <template x-for="(msg, index) in messages" :key="msg.id || index">
                         <div :class="msg.is_me ? 'flex justify-end' : 'flex justify-start'" class="group message-in">
-                            <div :class="msg.is_me ? 'items-end' : 'items-start'" class="flex flex-col max-w-[75%]">
+                            <div :class="msg.is_me ? 'items-end' : 'items-start'" class="flex flex-col max-w-[85%] md:max-w-[75%]">
 
                                 <div :class="msg.is_me ?
                                     'bg-blue-600 text-white rounded-2xl rounded-tr-none' :
                                     'bg-white border border-slate-200 text-slate-700 rounded-2xl rounded-tl-none'"
-                                    class="p-4 shadow-sm relative transition-all group-hover:shadow-md">
+                                    class="p-3 md:p-4 shadow-sm relative transition-all group-hover:shadow-md">
 
                                     {{-- IMAGE HANDLING --}}
                                     <template x-if="msg.image">
-                                        <div class="mb-2 overflow-hidden rounded-xl border border-black/5 bg-slate-100">
-                                            <img :src="msg.image.startsWith('blob') ? msg.image : '/storage/' + msg.image"
-                                                class="max-w-[240px] w-full cursor-zoom-in hover:opacity-95 transition-opacity object-cover"
-                                                @click="window.open(msg.image.startsWith('blob') ? msg.image : '/storage/' + msg.image)">
+                                        <div class="mb-2 overflow-hidden rounded-xl bg-slate-100 border border-black/5">
+                                            <img :src="msg.image.startsWith('blob') || msg.image.startsWith('http') ? msg.image : '/storage/' + msg.image"
+                                                class="max-w-full w-full cursor-zoom-in hover:opacity-95 transition-opacity object-cover"
+                                                @click="window.open(msg.image.startsWith('blob') || msg.image.startsWith('http') ? msg.image : '/storage/' + msg.image)">
                                         </div>
                                     </template>
 
                                     <div class="relative">
-                                        <p class="text-sm leading-relaxed whitespace-pre-wrap" x-text="msg.text"></p>
-
+                                        <p class="text-xs md:text-sm leading-relaxed whitespace-pre-wrap" x-text="msg.text"></p>
                                         <template x-if="msg.is_edited">
-                                            <span class="text-[10px] opacity-60 italic block mt-1"
+                                            <span class="text-[9px] opacity-60 italic block mt-1"
                                                   :class="msg.is_me ? 'text-white/80' : 'text-slate-400'">(disunting)</span>
                                         </template>
                                     </div>
 
                                     {{-- ACTIONS (EDIT/DELETE) --}}
                                     <div x-show="msg.is_me"
-                                        class="absolute -left-12 top-0 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button @click="openEditModal(msg)"
-                                            class="w-8 h-8 bg-white border border-slate-100 shadow-sm rounded-full text-blue-500 hover:bg-blue-50 flex items-center justify-center">
-                                            <i class="fa-solid fa-pen text-[10px]"></i>
+                                        class="absolute -left-10 md:-left-12 top-0 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button @click="openEditModal(msg)" class="w-7 h-7 md:w-8 md:h-8 bg-white border border-slate-100 shadow-sm rounded-full text-blue-500 hover:bg-blue-50 flex items-center justify-center">
+                                            <i class="fa-solid fa-pen text-[9px]"></i>
                                         </button>
-                                        <button @click="openDeleteModal(msg.id)"
-                                            class="w-8 h-8 bg-white border border-slate-100 shadow-sm rounded-full text-red-500 hover:bg-red-50 flex items-center justify-center">
-                                            <i class="fa-solid fa-trash text-[10px]"></i>
+                                        <button @click="openDeleteModal(msg.id)" class="w-7 h-7 md:w-8 md:h-8 bg-white border border-slate-100 shadow-sm rounded-full text-red-500 hover:bg-red-50 flex items-center justify-center">
+                                            <i class="fa-solid fa-trash text-[9px]"></i>
                                         </button>
                                     </div>
                                 </div>
 
-                                <span class="text-[10px] mt-1.5 font-bold text-slate-400 uppercase tracking-wider"
+                                <span class="text-[9px] md:text-[10px] mt-1.5 font-bold text-slate-400 uppercase tracking-wider"
                                     x-text="msg.time"></span>
                             </div>
                         </div>
@@ -134,49 +119,48 @@
                 </div>
 
                 {{-- INPUT AREA --}}
-                <div class="p-4 bg-white border-t border-slate-100 relative">
+                <div class="p-3 md:p-4 bg-white border-t border-slate-100 relative">
                     {{-- FILE PREVIEW POPUP --}}
                     <div x-show="fileToUpload" x-cloak
                         class="absolute bottom-full left-4 mb-4 p-2 bg-white border border-slate-200 rounded-2xl shadow-xl flex items-center gap-3 animate-bounce-short">
                         <div class="relative">
-                            <img :src="filePreview" class="w-14 h-14 rounded-xl object-cover border border-slate-100">
+                            <img :src="filePreview" class="w-12 h-12 md:w-14 md:h-14 rounded-xl object-cover border border-slate-100">
                             <button type="button" @click="clearFile"
                                 class="absolute -top-2 -right-2 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] shadow-lg">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                         </div>
-                        <div class="pr-4">
-                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Siap Dikirim</p>
-                            <p class="text-xs font-bold text-slate-700 truncate max-w-[120px]" x-text="fileToUpload?.name">
-                            </p>
+                        <div class="pr-2 md:pr-4">
+                            <p class="text-[8px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest">Siap Dikirim</p>
+                            <p class="text-[10px] md:text-xs font-bold text-slate-700 truncate max-w-[120px]" x-text="fileToUpload?.name"></p>
                         </div>
                     </div>
 
                     <form @submit.prevent="sendMessage()"
-                        class="flex items-center gap-3 bg-slate-50 p-2 rounded-2xl border border-slate-200 focus-within:border-blue-400 focus-within:bg-white transition-all">
+                        class="flex items-center gap-2 md:gap-3 bg-slate-50 p-1.5 md:p-2 rounded-2xl border border-slate-200 focus-within:border-blue-400 focus-within:bg-white transition-all shadow-inner">
 
                         <button type="button" @click="triggerFileInput"
-                            class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:bg-white hover:text-blue-600 cursor-pointer transition-all">
-                            <i class="fa-solid fa-camera text-lg"></i>
+                            class="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-xl text-slate-400 hover:bg-white hover:text-blue-600 cursor-pointer transition-all">
+                            <i class="fa-solid fa-camera text-base md:text-lg"></i>
                         </button>
                         <input type="file" id="fileInput" @change="handleFileUpload" hidden accept="image/*">
 
                         <input type="text" x-model="newMessage" placeholder="Tulis pesan ke admin..."
-                            class="flex-1 bg-transparent border-none focus:ring-0 text-sm font-medium text-slate-700">
+                            class="flex-1 bg-transparent border-none focus:ring-0 text-sm font-medium text-slate-700 placeholder:text-slate-400">
 
                         <button type="submit" :disabled="!newMessage.trim() && !fileToUpload"
-                            class="px-5 py-2.5 bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-md disabled:opacity-30 transition-all font-black text-[10px] uppercase tracking-widest">
-                            <span>Kirim</span>
-                            <i class="fa-solid fa-paper-plane ml-2"></i>
+                            class="px-4 md:px-5 py-2 md:py-2.5 bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-md disabled:opacity-30 transition-all font-black text-[9px] md:text-[10px] uppercase tracking-widest">
+                            <span class="hidden md:inline">Kirim</span>
+                            <i class="fa-solid fa-paper-plane md:ml-2"></i>
                         </button>
                     </form>
                 </div>
             </div>
 
-            {{-- SIDEBAR DETAIL --}}
+            {{-- SIDEBAR DETAIL (HIDDEN ON MOBILE) --}}
             <div class="hidden lg:col-span-4 lg:flex flex-col gap-4">
                 <div class="bg-white border border-slate-200 rounded-[32px] p-6 shadow-sm overflow-hidden relative">
-                    <h4 class="font-black text-slate-800 text-xs uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                    <h4 class="font-black text-slate-800 text-[10px] uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                         <span class="w-2 h-2 bg-blue-600 rounded-full"></span> Detail Layanan
                     </h4>
                     <div class="space-y-4 relative z-10">
@@ -186,14 +170,13 @@
                         </div>
                         <div class="p-5 bg-gradient-to-br from-slate-800 to-slate-900 rounded-[24px] text-white shadow-lg">
                             <p class="text-[10px] font-bold opacity-60 uppercase mb-1">Total Pembayaran</p>
-                            <p class="text-2xl font-black">Rp {{ number_format($booking->total_price ?? 0, 0, ',', '.') }}
-                            </p>
+                            <p class="text-xl font-black">Rp {{ number_format($booking->total_price ?? 0, 0, ',', '.') }}</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="bg-white border border-slate-200 rounded-[32px] p-6 shadow-sm">
-                    <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Bantuan Cepat</h5>
+                    <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Balasan Cepat</h5>
                     <div class="flex flex-col gap-2">
                         <template x-for="q in quickReplies" :key="q">
                             <button @click="newMessage = q; sendMessage()"
@@ -228,7 +211,7 @@
                     <button @click="showEditModal = false"
                         class="flex-1 py-3 text-xs font-black text-slate-400 hover:text-slate-600">Batal</button>
                     <button @click="updateMessage"
-                        class="flex-1 py-3 bg-blue-600 text-white rounded-xl text-xs font-black shadow-lg hover:bg-blue-700 transition-colors">Simpan Perubahan</button>
+                        class="flex-1 py-3 bg-blue-600 text-white rounded-xl text-xs font-black shadow-lg hover:bg-blue-700 transition-colors">Simpan</button>
                 </div>
             </div>
         </div>
@@ -241,16 +224,16 @@
             x-transition:enter-end="opacity-100 scale-100">
             <div class="bg-white rounded-[32px] w-full max-w-sm shadow-2xl overflow-hidden text-center p-8"
                 @click.away="showDeleteModal = false">
-                <div class="w-20 h-20 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                    <i class="fa-solid fa-trash-can text-3xl"></i>
+                <div class="w-16 h-16 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                    <i class="fa-solid fa-trash-can text-2xl"></i>
                 </div>
                 <h3 class="text-lg font-black text-slate-800 mb-2">Hapus Pesan?</h3>
                 <p class="text-sm text-slate-500 mb-6">Tindakan ini tidak dapat dibatalkan.</p>
                 <div class="flex gap-3">
                     <button @click="showDeleteModal = false"
-                        class="flex-1 py-4 text-xs font-black text-slate-400">Batal</button>
+                        class="flex-1 py-3 text-xs font-black text-slate-400">Batal</button>
                     <button @click="deleteMsg"
-                        class="flex-1 py-4 bg-red-500 text-white rounded-2xl text-xs font-black shadow-lg hover:bg-red-600 transition-colors">Ya, Hapus</button>
+                        class="flex-1 py-3 bg-red-500 text-white rounded-2xl text-xs font-black shadow-lg hover:bg-red-600 transition-colors">Ya, Hapus</button>
                 </div>
             </div>
         </div>
@@ -272,76 +255,34 @@
                 editingId: null,
                 editText: '',
                 deletingId: null,
-                quickReplies: ['Bagaimana status pesanan saya?', 'Bisa minta update progres?', 'Terima kasih banyak!'],
+                quickReplies: ['Bagaimana status pesanan?', 'Bisa minta update progres?', 'Terima kasih!'],
 
                 init() {
-                    // Mengambil data awal dari Laravel
-                    const initialData = {!! json_encode(
-                        $messages->map(function ($m) {
-                            return [
-                                'id' => $m->id,
-                                'message' => $m->message,
-                                'image' => $m->image,
-                                'sender_id' => $m->sender_id,
-                                'sender_type' => $m->sender_type,
-                                'created_at' => $m->created_at->toIso8601String(),
-                                'updated_at' => $m->updated_at->toIso8601String(),
-                                'time' => $m->created_at->timezone('Asia/Jakarta')->format('H:i'),
-                            ];
-                        }),
-                    ) !!};
+                    const initialData = {!! json_encode($messages->map(fn($m) => [
+                        'id' => $m->id,
+                        'message' => $m->message,
+                        'image' => $m->image,
+                        'sender_id' => $m->sender_id,
+                        'sender_type' => $m->sender_type,
+                        'created_at' => $m->created_at->toIso8601String(),
+                        'updated_at' => $m->updated_at->toIso8601String(),
+                        'time' => $m->created_at->timezone('Asia/Jakarta')->format('H:i'),
+                    ])) !!};
 
                     this.messages = this.formatMessages(initialData);
                     this.scrollToBottom();
-
-                    // Polling pesan baru setiap 3 detik
-                    setInterval(() => this.fetchMessages(), 3000);
+                    setInterval(() => this.fetchMessages(), 4000);
                 },
 
                 formatMessages(rawMessages) {
-                    return rawMessages.map(m => {
-                        const created = new Date(m.created_at).getTime();
-                        const updated = new Date(m.updated_at).getTime();
-
-                        // Cek apakah pengirim adalah user yang sedang login
-                        const isMe = m.sender_type.toLowerCase() === 'user' && parseInt(m.sender_id) === this.currentUserId;
-
-                        // Pesan dianggap disunting jika selisih update > 2 detik
-                        const hasBeenEdited = Math.abs(updated - created) > 2000;
-
-                        return {
-                            id: m.id,
-                            text: m.message,
-                            image: m.image,
-                            sender_id: m.sender_id,
-                            is_me: isMe,
-                            is_edited: hasBeenEdited,
-                            time: m.time || new Date(m.created_at).toLocaleTimeString('id-ID', {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: false
-                            })
-                        };
-                    });
-                },
-
-                async fetchMessages() {
-                    try {
-                        const response = await fetch('{{ route('chat.index') }}?ajax=1', {
-                            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
-                        });
-                        if (response.ok) {
-                            const data = await response.json();
-                            const formatted = this.formatMessages(data);
-
-                            // Hanya update jika ada perubahan data (jumlah pesan atau konten)
-                            if (JSON.stringify(formatted) !== JSON.stringify(this.messages)) {
-                                this.messages = formatted;
-                                // Kita tidak selalu scroll ke bawah agar user tidak terganggu saat membaca pesan lama
-                                // Namun untuk kemudahan, kita scroll jika ini pesan baru
-                            }
-                        }
-                    } catch (error) { console.error('Polling error:', error); }
+                    return rawMessages.map(m => ({
+                        id: m.id,
+                        text: m.message,
+                        image: m.image,
+                        is_me: m.sender_type.toLowerCase() === 'user' && parseInt(m.sender_id) === this.currentUserId,
+                        is_edited: (new Date(m.updated_at).getTime() - new Date(m.created_at).getTime()) > 2000,
+                        time: m.time
+                    }));
                 },
 
                 triggerFileInput() { document.getElementById('fileInput').click(); },
@@ -349,8 +290,8 @@
                 handleFileUpload(e) {
                     const file = e.target.files[0];
                     if (file) {
-                        if (file.size > 2 * 1024 * 1024) { // Limit 2MB contohnya
-                            alert('Ukuran file terlalu besar (Maks 2MB)');
+                        if (file.size > 5 * 1024 * 1024) {
+                            alert('File maksimal 5MB');
                             return;
                         }
                         this.fileToUpload = file;
@@ -368,54 +309,45 @@
                 async sendMessage() {
                     if (!this.newMessage.trim() && !this.fileToUpload) return;
 
-                    const tempId = Date.now();
-                    const now = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
-
-                    const textToSend = this.newMessage;
-                    const fileToSend = this.fileToUpload;
-                    const previewToSend = this.filePreview;
-
-                    // Push UI secara instan (Optimistic UI)
-                    this.messages.push({
-                        id: tempId,
-                        text: textToSend,
-                        image: fileToSend ? previewToSend : null,
-                        is_me: true,
-                        time: now,
-                        is_edited: false
-                    });
-
-                    this.newMessage = '';
-                    const oldFilePreview = this.filePreview; // Simpan untuk dibersihkan nanti
-                    this.clearFile();
-                    this.scrollToBottom();
-
                     const formData = new FormData();
-                    formData.append('_token', '{{ csrf_token() }}');
-                    formData.append('message', textToSend);
-                    formData.append('booking_id', '{{ $booking->id ?? '' }}');
-                    if (fileToSend) formData.append('image', fileToSend);
+                    formData.append('message', this.newMessage);
+                    formData.append('booking_id', '{{ $booking->id ?? "" }}');
+                    if (this.fileToUpload) formData.append('image', this.fileToUpload);
+
+                    // Optimistic UI updates
+                    const tempText = this.newMessage;
+                    this.newMessage = '';
+                    this.clearFile();
 
                     try {
-                        const response = await fetch('{{ route('chat.send') }}', {
+                        const response = await fetch('{{ route("chat.send") }}', {
                             method: 'POST',
                             body: formData,
-                            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json'
+                                // JANGAN set Content-Type secara manual saat menggunakan FormData
+                            }
                         });
 
-                        const result = await response.json();
+                        if (!response.ok) throw new Error('Network response was not ok');
 
-                        // Update ID sementara dengan ID asli dari database
-                        const idx = this.messages.findIndex(m => m.id === tempId);
-                        if (idx !== -1) {
-                            this.messages[idx].id = result.data.id;
-                            if (result.data.image) this.messages[idx].image = result.data.image;
-                        }
+                        await this.fetchMessages();
+                        this.scrollToBottom();
                     } catch (err) {
-                        // Jika gagal, hapus pesan yang gagal terkirim dari UI
-                        this.messages = this.messages.filter(m => m.id !== tempId);
-                        alert('Gagal mengirim pesan. Silakan coba lagi.');
+                        alert('Gagal mengirim pesan. Cek koneksi Anda.');
+                        this.newMessage = tempText;
                     }
+                },
+
+                async fetchMessages() {
+                    try {
+                        const response = await fetch('{{ route("chat.index") }}?ajax=1');
+                        if (response.ok) {
+                            const data = await response.json();
+                            this.messages = this.formatMessages(data);
+                        }
+                    } catch (e) { console.error("Fetch error", e); }
                 },
 
                 openEditModal(msg) {
@@ -432,17 +364,12 @@
                             headers: {
                                 'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'X-Requested-With': 'XMLHttpRequest',
                                 'Accept': 'application/json'
                             },
                             body: JSON.stringify({ message: this.editText })
                         });
                         if (response.ok) {
-                            const idx = this.messages.findIndex(m => m.id === this.editingId);
-                            if (idx !== -1) {
-                                this.messages[idx].text = this.editText;
-                                this.messages[idx].is_edited = true;
-                            }
+                            await this.fetchMessages();
                             this.showEditModal = false;
                         }
                     } catch (err) { console.error(err); }
@@ -459,7 +386,6 @@
                             method: 'DELETE',
                             headers: {
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'X-Requested-With': 'XMLHttpRequest',
                                 'Accept': 'application/json'
                             }
                         });

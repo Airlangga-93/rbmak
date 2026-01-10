@@ -23,12 +23,12 @@
     input:checked + .card-content {
         border-color: #f97316;
         background-color: #fffaf8;
-        transform: translateY(-8px);
-        box-shadow: 0 20px 25px -5px rgba(249, 115, 22, 0.15);
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px -5px rgba(249, 115, 22, 0.15);
     }
 
     .check-container {
-        position: absolute; top: 16px; right: 16px; width: 28px; height: 28px;
+        position: absolute; top: 12px; right: 12px; width: 24px; height: 24px;
         border-radius: 50%; border: 2px solid #E2E8F0; background: white;
         display: flex; align-items: center; justify-content: center; z-index: 10;
         transition: all 0.3s ease;
@@ -38,42 +38,48 @@
         background: #22C55E; border-color: #22C55E; transform: scale(1.1);
     }
 
-    input:checked + .card-content .check-icon { display: block !important; }
-
     .floating-bar {
-        box-shadow: 0 -15px 30px -5px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Fix for mobile modal */
+    @media (max-width: 640px) {
+        .booking-modal {
+            border-bottom-left-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+        }
     }
 </style>
 @endsection
 
 @section('content')
-<div x-data="bookingApp()" x-cloak class="pb-32">
+<div x-data="bookingApp()" x-cloak class="pb-40">
 
     {{-- FILTER & SEARCH BAR --}}
-    <div class="sticky top-16 z-30 bg-slate-50/80 backdrop-blur-md py-4 mb-8">
+    <div class="sticky top-0 md:top-16 z-30 bg-[#F8FAFC]/90 backdrop-blur-md py-4 mb-6 md:mb-10">
         <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
-            <div class="bg-white p-1.5 rounded-2xl shadow-sm border flex w-full md:w-auto">
+            {{-- Category Switcher --}}
+            <div class="bg-white p-1 md:p-1.5 rounded-2xl shadow-sm border flex w-full md:w-auto overflow-hidden">
                 <button @click="filter='all'" :class="filter==='all'?'bg-orange-600 text-white shadow-md':'text-slate-500 hover:bg-slate-50'"
-                    class="flex-1 md:flex-none px-6 py-2.5 text-xs font-bold rounded-xl transition-all">Semua</button>
+                    class="flex-1 md:flex-none px-4 md:px-8 py-2.5 text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl transition-all">Semua</button>
                 <button @click="filter='barang'" :class="filter==='barang'?'bg-orange-600 text-white shadow-md':'text-slate-500 hover:bg-slate-50'"
-                    class="flex-1 md:flex-none px-6 py-2.5 text-xs font-bold rounded-xl transition-all">Barang</button>
+                    class="flex-1 md:flex-none px-4 md:px-8 py-2.5 text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl transition-all">Barang</button>
                 <button @click="filter='jasa'" :class="filter==='jasa'?'bg-orange-600 text-white shadow-md':'text-slate-500 hover:bg-slate-50'"
-                    class="flex-1 md:flex-none px-6 py-2.5 text-xs font-bold rounded-xl transition-all">Jasa</button>
+                    class="flex-1 md:flex-none px-4 md:px-8 py-2.5 text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl transition-all">Jasa</button>
             </div>
 
-            <div class="relative w-full md:w-72">
-                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                <input type="text" x-model="search" placeholder="Cari layanan..."
-                    class="w-full pl-11 pr-4 py-3 rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-orange-500 transition-all text-sm">
+            {{-- Search --}}
+            <div class="relative w-full md:w-80">
+                <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" x-model="search" placeholder="Cari layanan PT RBM..."
+                    class="w-full pl-12 pr-5 py-3.5 rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-orange-500 transition-all text-sm font-medium">
             </div>
         </div>
     </div>
 
     {{-- GRID PRODUK --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        @php
-            $allItems = collect($products)->merge($services);
-        @endphp
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-8">
+        @php $allItems = collect($products)->merge($services); @endphp
 
         @foreach ($allItems as $item)
         <label x-show="shouldShow('{{ strtolower($item->type) }}', '{{ strtolower($item->name) }}')"
@@ -86,26 +92,21 @@
                 @change="updateSelection($event)"
                 :checked="selectedItems.includes('{{ $item->name }}')">
 
-            <div class="card-content h-full rounded-[32px] overflow-hidden flex flex-col relative">
+            <div class="card-content h-full rounded-[30px] overflow-hidden flex flex-col relative">
                 <div class="check-container">
-                    <i class="fa-solid fa-check check-icon hidden text-[12px] text-white"></i>
+                    <i class="fa-solid fa-check text-[10px] text-white" x-show="selectedItems.includes('{{ $item->name }}')"></i>
                 </div>
 
                 {{-- IMAGE SECTION --}}
-                <div class="h-56 bg-slate-100 overflow-hidden relative">
+                <div class="h-48 md:h-56 bg-slate-100 overflow-hidden relative">
                     @php
                         $url = null;
                         if ($item->image) {
                             if (str_starts_with($item->image, 'http')) {
                                 $url = $item->image;
                             } else {
-                                $paths = ['storage/', 'assets/img/', ''];
-                                foreach ($paths as $path) {
-                                    if (file_exists(public_path($path . $item->image))) {
-                                        $url = asset($path . $item->image);
-                                        break;
-                                    }
-                                }
+                                $finalPath = str_contains($item->image, 'assets/') ? $item->image : 'storage/'.$item->image;
+                                $url = asset($finalPath);
                             }
                         }
                     @endphp
@@ -117,36 +118,35 @@
                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                     @endif
 
-                    <div class="placeholder-box h-full w-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900 text-white"
+                    <div class="placeholder-box h-full w-full flex flex-col items-center justify-center bg-slate-900 text-white"
                          style="{{ $url ? 'display:none;' : 'display:flex;' }}">
-                        <i class="fa-solid fa-tower-broadcast text-5xl mb-3 text-orange-500 opacity-80"></i>
-                        <span class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400">RBM Infrastructure</span>
-                        <div class="absolute inset-0 opacity-10" style="background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');"></div>
+                        <i class="fa-solid fa-tower-broadcast text-4xl mb-2 text-orange-500 opacity-80"></i>
+                        <span class="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400">RBM Portal</span>
                     </div>
 
-                    <div class="absolute bottom-4 left-4">
-                        <span class="px-3 py-1.5 bg-orange-600 text-white text-[9px] font-black uppercase rounded-lg shadow-lg">
+                    <div class="absolute bottom-3 left-3">
+                        <span class="px-2.5 py-1 bg-black/60 backdrop-blur-md text-white text-[8px] font-black uppercase rounded-lg">
                             {{ $item->type }}
                         </span>
                     </div>
                 </div>
 
-                <div class="p-7 flex-grow flex flex-col">
-                    <h3 class="font-bold text-slate-800 text-lg leading-tight mb-3 group-hover:text-orange-600 transition-colors">
+                <div class="p-6 flex-grow flex flex-col">
+                    <h3 class="font-bold text-slate-800 text-base md:text-lg leading-tight mb-2 group-hover:text-orange-600 transition-colors uppercase tracking-tight">
                         {{ $item->name }}
                     </h3>
-                    <p class="text-xs text-slate-500 leading-relaxed mb-6 flex-grow">
-                        {{ Str::limit($item->description, 100) }}
+                    <p class="text-xs text-slate-500 leading-relaxed mb-4 flex-grow">
+                        {{ Str::limit($item->description, 80) }}
                     </p>
-                    <div class="mt-auto pt-5 border-t border-slate-100 flex items-center justify-between">
+                    <div class="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
                         <div>
-                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Harga Mulai</p>
-                            <div class="text-xl font-black text-slate-900 tracking-tight">
+                            <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Estimasi Biaya</p>
+                            <div class="text-lg font-black text-slate-900 tracking-tight">
                                 Rp{{ number_format($item->price, 0, ',', '.') }}
                             </div>
                         </div>
-                        <div class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-orange-50 group-hover:text-orange-500 transition-all">
-                            <i class="fa-solid fa-plus"></i>
+                        <div class="w-9 h-9 rounded-xl bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-orange-600 group-hover:text-white transition-all shadow-sm">
+                            <i class="fa-solid fa-plus text-xs"></i>
                         </div>
                     </div>
                 </div>
@@ -157,8 +157,8 @@
 
     {{-- EMPTY STATE --}}
     <div x-show="isEmpty()" class="py-20 text-center">
-        <i class="fa-solid fa-box-open text-6xl text-slate-200 mb-4"></i>
-        <p class="text-slate-500 font-bold uppercase tracking-widest">Layanan tidak ditemukan</p>
+        <i class="fa-solid fa-search text-6xl text-slate-200 mb-4"></i>
+        <p class="text-slate-400 font-bold uppercase tracking-widest text-sm">Layanan tidak ditemukan</p>
     </div>
 
     {{-- STEP 2: MODAL PENJADWALAN --}}
@@ -166,36 +166,40 @@
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
-         class="fixed inset-0 z-[70] flex items-center justify-center px-4">
-        <div @click="step = 1" class="absolute inset-0 bg-slate-900/90 backdrop-blur-sm"></div>
-        <div class="relative bg-white w-full max-w-lg rounded-[40px] shadow-2xl overflow-hidden">
-            <div class="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
-                <h2 class="text-2xl font-black text-slate-900">Atur Jadwal</h2>
-                <button @click="step = 1" class="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors">
-                    <i class="fa-solid fa-xmark text-xl"></i>
+         class="fixed inset-0 z-[70] flex items-end sm:items-center justify-center px-0 sm:px-4">
+
+        <div @click="step = 1" class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm"></div>
+
+        <div class="booking-modal relative bg-white w-full max-w-lg rounded-t-[35px] sm:rounded-[40px] shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-500">
+            <div class="p-6 md:p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
+                <h2 class="text-xl md:text-2xl font-black text-slate-900 uppercase">Atur Jadwal</h2>
+                <button @click="step = 1" class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-slate-400">
+                    <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-            <div class="p-8 space-y-8">
+
+            <div class="p-6 md:p-8 space-y-6 md:space-y-8 max-h-[70vh] overflow-y-auto no-scrollbar">
                 <div>
-                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Pilih Tanggal</label>
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Pilih Tanggal</label>
                     <input type="date" x-model="bookingDate" min="{{ date('Y-m-d') }}"
-                        class="w-full p-5 rounded-[20px] border-2 border-slate-100 focus:border-orange-500 focus:ring-0 font-bold bg-slate-50 outline-none transition-all">
+                        class="w-full p-4 rounded-2xl border-2 border-slate-100 focus:border-orange-500 focus:ring-0 font-bold bg-slate-50 outline-none transition-all">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Pilih Jam</label>
-                    <div class="grid grid-cols-3 gap-3">
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Pilih Jam</label>
+                    <div class="grid grid-cols-3 gap-2 md:gap-3">
                         <template x-for="time in timeSlots" :key="time">
                             <button @click="bookingTime=time"
                                 :class="bookingTime===time?'bg-orange-600 text-white shadow-lg border-orange-600':'bg-white border-slate-100 text-slate-600 hover:border-orange-200'"
-                                class="p-4 rounded-[15px] text-xs font-black border-2 transition-all" x-text="time"></button>
+                                class="p-3 md:p-4 rounded-xl text-[11px] font-black border-2 transition-all" x-text="time"></button>
                         </template>
                     </div>
                 </div>
             </div>
-            <div class="p-8 bg-slate-50 flex gap-4">
-                <button @click="step = 1" class="flex-1 py-4 font-bold text-slate-400 hover:text-slate-600">Batal</button>
+
+            <div class="p-6 md:p-8 bg-slate-50 flex gap-3 md:gap-4">
+                <button @click="step = 1" class="flex-1 py-4 font-bold text-slate-400 hover:text-slate-600 uppercase text-xs">Batal</button>
                 <button @click="submitBooking()" :disabled="loading || !bookingDate || !bookingTime"
-                    class="flex-[2] py-4 bg-orange-600 text-white rounded-[20px] font-black shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 transition-all hover:bg-orange-700">
+                    class="flex-[2] py-4 bg-orange-600 text-white rounded-2xl font-black shadow-xl disabled:opacity-50 flex items-center justify-center gap-3 transition-all hover:bg-orange-700 uppercase text-xs tracking-widest">
                     <span x-show="!loading">Konfirmasi</span>
                     <i x-show="loading" class="fa-solid fa-circle-notch animate-spin"></i>
                 </button>
@@ -204,23 +208,23 @@
     </div>
 
     {{-- FLOATING BAR --}}
-    <div class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[92%] max-w-5xl z-50 transition-all duration-700"
-         :class="selectedItems.length > 0 ? 'translate-y-0 opacity-100' : 'translate-y-32 opacity-0 pointer-events-none'">
-        <div class="floating-bar bg-slate-900/95 rounded-[35px] p-5 md:p-7 flex flex-col md:flex-row items-center justify-between gap-5 border border-white/10 backdrop-blur-xl">
-            <div class="flex items-center gap-5">
-                <div class="w-14 h-14 bg-orange-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
-                    <i class="fa-solid fa-cart-flatbed text-xl"></i>
+    <div class="fixed bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 w-[95%] max-w-5xl z-50 transition-all duration-500"
+         :class="selectedItems.length > 0 ? 'translate-y-0 opacity-100' : 'translate-y-40 opacity-0 pointer-events-none'">
+        <div class="floating-bar bg-slate-900 rounded-[30px] p-4 md:p-6 flex flex-row items-center justify-between gap-4 border border-white/10 backdrop-blur-xl">
+            <div class="flex items-center gap-3 md:gap-5">
+                <div class="w-10 h-10 md:w-14 md:h-14 bg-orange-600 rounded-xl md:rounded-2xl flex items-center justify-center text-white shadow-lg shrink-0">
+                    <i class="fa-solid fa-cart-shopping text-sm md:text-xl"></i>
                 </div>
-                <div>
-                    <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Total Estimasi (<span x-text="selectedItems.length"></span> Item)</p>
-                    <h3 class="text-2xl md:text-3xl font-black text-white leading-none" x-text="formatRupiah(totalPrice)"></h3>
+                <div class="min-w-0">
+                    <p class="text-slate-400 text-[8px] md:text-[10px] font-black uppercase tracking-widest mb-0.5"><span x-text="selectedItems.length"></span> Item Terpilih</p>
+                    <h3 class="text-base md:text-3xl font-black text-white leading-none truncate" x-text="formatRupiah(totalPrice)"></h3>
                 </div>
             </div>
-            <div class="flex w-full md:w-auto gap-4">
-                <button @click="clearSelection()" class="flex-1 md:flex-none px-6 py-3 text-slate-400 hover:text-red-400 text-xs font-black uppercase transition-colors">Reset</button>
+            <div class="flex gap-2 shrink-0">
+                <button @click="clearSelection()" class="hidden md:block px-6 py-3 text-slate-400 hover:text-red-400 text-xs font-black uppercase transition-colors">Reset</button>
                 <button @click="step = 2"
-                    class="flex-[2] md:flex-none px-12 py-5 bg-orange-600 hover:bg-orange-500 text-white rounded-[22px] font-black shadow-2xl transition-all flex items-center justify-center gap-3">
-                    Lanjut <i class="fa-solid fa-arrow-right text-xs"></i>
+                    class="px-6 md:px-12 py-3.5 md:py-5 bg-orange-600 hover:bg-orange-500 text-white rounded-xl md:rounded-[22px] font-black shadow-2xl transition-all flex items-center justify-center gap-2 text-[10px] md:text-xs uppercase tracking-widest">
+                    Pesan <i class="fa-solid fa-arrow-right text-[10px]"></i>
                 </button>
             </div>
         </div>
@@ -267,27 +271,23 @@ function bookingApp() {
         },
 
         isEmpty() {
-            // Logika untuk menampilkan empty state jika tidak ada card yang muncul
-            const items = document.querySelectorAll('label[x-show]');
-            let visibleCount = 0;
-            items.forEach(el => {
-                if (el.style.display !== 'none') visibleCount++;
+            if (this.search === '') return false;
+            let visible = false;
+            document.querySelectorAll('label[x-show]').forEach(el => {
+                if (window.getComputedStyle(el).display !== 'none') visible = true;
             });
-            return visibleCount === 0 && this.search !== '';
+            return !visible;
         },
 
         formatRupiah(n) {
             return new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                minimumFractionDigits: 0
+                style: 'currency', currency: 'IDR', minimumFractionDigits: 0
             }).format(n);
         },
 
         async submitBooking() {
             if(!this.bookingDate || !this.bookingTime) {
-                alert("Mohon pilih tanggal dan jam!");
-                return;
+                alert("Pilih tanggal dan jam!"); return;
             }
 
             this.loading = true;
@@ -308,16 +308,14 @@ function bookingApp() {
                     })
                 });
 
-                const result = await response.json();
-
                 if(response.ok) {
                     window.location.href = "{{ route('booking.riwayat') }}";
                 } else {
-                    alert(result.message || "Gagal menyimpan booking.");
+                    const result = await response.json();
+                    alert(result.message || "Gagal menyimpan.");
                 }
             } catch (error) {
-                console.error(error);
-                alert("Terjadi kesalahan sistem!");
+                alert("Kesalahan sistem!");
             } finally {
                 this.loading = false;
             }

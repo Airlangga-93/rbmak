@@ -116,16 +116,17 @@
                                 <p class="text-[10px] uppercase font-bold text-gray-400 mb-2">Gambar Saat Ini</p>
                                 @if($product->image)
                                     @php
-                                        // Pengecekan path agar sinkron dengan folder uploads/products
+                                        // PERBAIKAN LOGIKA PATH:
                                         if (str_contains($product->image, 'assets/')) {
                                             $imageUrl = asset($product->image);
-                                        } elseif (str_contains($product->image, 'uploads/')) {
-                                            $imageUrl = asset('storage/' . $product->image);
                                         } else {
-                                            $imageUrl = asset('storage/uploads/products/' . $product->image);
+                                            // Menyesuaikan folder 'produk' sesuai standar Controller baru
+                                            $imageUrl = asset('storage/' . $product->image);
                                         }
                                     @endphp
-                                    <img src="{{ $imageUrl }}" class="w-24 h-24 object-cover rounded-lg border shadow-sm bg-white p-1">
+                                    <img src="{{ $imageUrl }}"
+                                         class="w-24 h-24 object-cover rounded-lg border shadow-sm bg-white p-1"
+                                         onerror="this.src='https://via.placeholder.com/150?text=No+Image';">
                                 @else
                                     <div class="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400">
                                         <i class="fas fa-image"></i>
@@ -138,7 +139,7 @@
                                 <p class="text-[10px] uppercase font-bold text-gray-400 mb-2">Ganti Gambar Baru</p>
                                 <input type="file" name="image" id="image"
                                     class="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-dark-tower file:text-white hover:file:bg-gray-700 transition-all">
-                                <p class="mt-2 text-[10px] text-gray-400 italic font-medium"><i class="fas fa-info-circle mr-1"></i> Kosongkan jika tidak ingin mengganti gambar. (Maks 4MB).</p>
+                                <p class="mt-2 text-[10px] text-gray-400 italic font-medium"><i class="fas fa-info-circle mr-1"></i> Kosongkan jika tidak ingin mengganti gambar. (Maks 2MB).</p>
                             </div>
                         </div>
                     </div>

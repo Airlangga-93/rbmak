@@ -75,14 +75,14 @@
                                 @if($gallery->image)
                                     <a href="{{ route('admin.galleries.show', $gallery->id) }}" class="block relative w-40 h-24 overflow-hidden rounded-2xl border border-gray-100 shadow-sm bg-gray-50 group-hover:ring-2 group-hover:ring-accent-tower/30 transition-all">
 
-                                        {{-- LOGIKA DETEKSI GAMBAR (ASSETS VS STORAGE) --}}
+                                        {{-- PERBAIKAN LOGIKA DETEKSI GAMBAR --}}
                                         @php
-                                            if (str_starts_with($gallery->image, 'assets/')) {
+                                            if (str_contains($gallery->image, 'assets/')) {
+                                                // Jika path dari seeder (misal: assets/img/gallery/...)
                                                 $finalPath = asset($gallery->image);
-                                            } elseif (str_starts_with($gallery->image, 'gallery/')) {
-                                                // Jika path di database "gallery/foto.jpg" tapi file fisik di "public/assets/img/gallery/"
-                                                $finalPath = asset('assets/img/' . $gallery->image);
                                             } else {
+                                                // Jika upload baru (misal: gallery/namafile.jpg)
+                                                // Kita panggil storage/ lalu path aslinya
                                                 $finalPath = asset('storage/' . $gallery->image);
                                             }
                                         @endphp

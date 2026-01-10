@@ -58,7 +58,7 @@ class FacilityController extends Controller
 
         Facility::create($validatedData);
 
-        return redirect()->route('admin.facilities.index')->with('success', '✅ Fasilitas berhasil ditambahkan!');
+        return redirect()->route('admin.facilities.index')->with('success', ' Fasilitas berhasil ditambahkan!');
     }
 
     /**
@@ -111,7 +111,7 @@ class FacilityController extends Controller
 
         $facility->update($validatedData);
 
-        return redirect()->route('admin.facilities.index')->with('success', '✅ Fasilitas berhasil diperbarui!');
+        return redirect()->route('admin.facilities.index')->with('success', ' Fasilitas berhasil diperbarui!');
     }
 
     /**
@@ -126,6 +126,6 @@ class FacilityController extends Controller
 
         $facility->delete();
 
-        return redirect()->route('admin.facilities.index')->with('success', '🗑️ Fasilitas berhasil dihapus!');
+        return redirect()->route('admin.facilities.index')->with('success', ' Fasilitas berhasil dihapus!');
     }
 }

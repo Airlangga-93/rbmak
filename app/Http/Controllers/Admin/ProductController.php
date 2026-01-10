@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 
 class ProductController extends Controller
 {
@@ -19,6 +20,8 @@ class ProductController extends Controller
             $query->where('type', $filterType);
         }
 
+        // Paginate dipercepat dengan simplePaginate jika data sangat banyak,
+        // tapi tetap gunakan paginate(10) untuk tampilan standar.
         $products = $query->paginate(10);
         return view('admin.tables.products.index', compact('products', 'filterType'));
     }
@@ -35,31 +38,30 @@ class ProductController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
             'price' => ['required', 'numeric', 'min:0'],
-            'image' => [$request->input('type') === 'barang' ? 'required' : 'nullable', 'image', 'max:4096'],
+            'image' => [$request->input('type') === 'barang' ? 'required' : 'nullable', 'image', 'max:2048'], // Max 2MB agar loading cepat
         ];
 
         $validated = $request->validate($rules);
         $validated['slug'] = $this->createUniqueSlug($validated['name']);
 
         if ($request->hasFile('image')) {
-            // Path: storage/app/public/produk
-            // Kita simpan nama filenya saja agar tidak terjadi double folder saat dipanggil di Blade
+            // PERBAIKAN: Simpan path lengkap 'produk/namafile.jpg' ke database
             $path = $request->file('image')->store('produk', 'public');
-            $validated['image'] = basename($path);
+            $validated['image'] = $path;
         }
 
         Product::create($validated);
         return redirect()->route('admin.products.index')->with('success', '✅ Produk berhasil ditambahkan!');
     }
 
-    public function show(Product $product)
-    {
-        return view('admin.tables.products.show', compact('product'));
-    }
-
     public function edit(Product $product)
     {
         return view('admin.tables.products.edit', compact('product'));
+    }
+
+    public function show(Product $product)
+    {
+        return view('admin.tables.products.show', compact('product'));
     }
 
     public function update(Request $request, Product $product)
@@ -69,7 +71,7 @@ class ProductController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
             'price' => ['required', 'numeric', 'min:0'],
-            'image' => ['nullable', 'image', 'max:4096'],
+            'image' => ['nullable', 'image', 'max:2048'],
         ];
 
         $validated = $request->validate($rules);
@@ -79,18 +81,18 @@ class ProductController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            // 1. Hapus gambar lama dari storage agar tidak menumpuk
-            if ($product->image && Storage::disk('public')->exists('produk/' . $product->image)) {
-                Storage::disk('public')->delete('produk/' . $product->image);
+            // PERBAIKAN: Hapus gambar lama agar storage tidak penuh (bikin loading berat)
+            if ($product->image && Storage::disk('public')->exists($product->image)) {
+                Storage::disk('public')->delete($product->image);
             }
 
-            // 2. Simpan gambar baru
+            // Simpan gambar baru dengan path lengkap
             $path = $request->file('image')->store('produk', 'public');
-            $validated['image'] = basename($path);
+            $validated['image'] = $path;
         }
 
         $product->update($validated);
-        return redirect()->route('admin.products.index')->with('success', '✅ Produk berhasil diperbarui!');
+        return redirect()->route('admin.products.index')->with('success', ' Produk berhasil diperbarui!');
     }
 
     private function createUniqueSlug($name, $id = null)
@@ -100,7 +102,6 @@ class ProductController extends Controller
         if ($id) {
             $query->where('id', '!=', $id);
         }
-
         if ($query->exists()) {
             return $slug . '-' . time();
         }
@@ -109,12 +110,12 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        // Hapus file fisik di storage sebelum data di database dihapus
-        if ($product->image && Storage::disk('public')->exists('produk/' . $product->image)) {
-            Storage::disk('public')->delete('produk/' . $product->image);
+        // Hapus file fisik sebelum hapus record database
+        if ($product->image && Storage::disk('public')->exists($product->image)) {
+            Storage::disk('public')->delete($product->image);
         }
 
         $product->delete();
-        return redirect()->route('admin.products.index')->with('success', '🗑️ Produk berhasil dihapus!');
+        return redirect()->route('admin.products.index')->with('success', ' Produk berhasil dihapus!');
     }
 }
