@@ -10,9 +10,9 @@
         --dark-tower: #2C3E50;
         --accent-tower: #FF8C00;
     }
-    .text-dark-tower { color: var(--dark-tower); }
-    .bg-dark-tower { background-color: var(--dark-tower); }
-    .text-accent-tower { color: var(--accent-tower); }
+    .text-dark-tower { color: #2C3E50; }
+    .bg-dark-tower { background-color: #2C3E50; }
+    .text-accent-tower { color: #FF8C00; }
     .shadow-soft { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
 </style>
 
@@ -31,20 +31,21 @@
             </a>
         </div>
 
-        <div class="bg-white rounded-xl shadow-soft overflow-hidden">
+        <div class="bg-white rounded-xl shadow-soft overflow-hidden border border-gray-100">
             <div class="flex flex-col md:flex-row">
 
                 {{-- Bagian Kiri: Gambar --}}
                 <div class="w-full md:w-2/5 bg-gray-50 p-6 flex flex-col items-center justify-center border-r border-gray-100">
                     @if($product->image)
                         @php
-                            // Logika path gambar disesuaikan dengan folder uploads/products
+                            /** * LOGIKA PATH GAMBAR (SINKRON DENGAN CONTROLLER BARU)
+                             * Jika dari assets bawaan: asset('assets/...')
+                             * Jika dari upload baru: asset('storage/produk/...')
+                             */
                             if (str_contains($product->image, 'assets/')) {
                                 $imageUrl = asset($product->image);
-                            } elseif (str_contains($product->image, 'uploads/')) {
-                                $imageUrl = asset('storage/' . $product->image);
                             } else {
-                                $imageUrl = asset('storage/uploads/products/' . $product->image);
+                                $imageUrl = asset('storage/' . $product->image);
                             }
                         @endphp
                         <div class="relative group w-full">

@@ -4,11 +4,8 @@
 
 @section('content')
 
-{{--
-    PERHATIAN:
-    Saya menghapus tag <html>, <head>, dan <body> karena ini adalah file @extend.
-    Layout utama sudah ada di admin.layouts.app.
---}}
+{{-- Library pendukung untuk Ikon --}}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
 <style>
     /* Definisi Warna Kustom (Tower Theme) */
@@ -24,29 +21,33 @@
         font-family: 'Poppins', sans-serif;
     }
 
-    input[type='search']::-webkit-search-decoration,
-    input[type='search']::-webkit-search-cancel-button,
-    input[type='search']::-webkit-search-results-button,
-    input[type='search']::-webkit-search-results-decoration {
-        -webkit-appearance: none;
+    /* Styling tombol aksi agar lebih terlihat */
+    .btn-action {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        transition: all 0.2s;
     }
 </style>
 
-<div class="main-content flex-1 p-4 sm:p-6 font-poppins">
+<div class="main-content flex-1 p-4 sm:p-6 font-poppins bg-[#f8f9fa]">
     <div class="bg-white rounded-xl shadow-soft p-4 sm:p-6">
         {{-- Header --}}
         <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 border-b pb-4 border-gray-100">
-            <h1 class="text-3xl font-bold text-dark-tower">Daftar Our Customer</h1>
+            <h1 class="text-3xl font-black text-dark-tower uppercase tracking-tighter">Daftar Customer</h1>
             <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
                 <div class="relative w-full sm:w-64">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3">
                         <i class="fas fa-search text-gray-400"></i>
                     </span>
                     <input type="search" id="searchInput" placeholder="Cari berdasarkan nama..."
-                        class="w-full pl-10 pr-4 py-2 border rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-accent-tower">
+                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-accent-tower">
                 </div>
                 <a href="{{ route('admin.partners.create') }}"
-                    class="bg-accent-tower text-white px-4 py-2 rounded-lg font-semibold hover:bg-accent-dark transition-colors duration-200 flex items-center justify-center space-x-2 w-full sm:w-auto shadow-md">
+                    class="bg-accent-tower text-white px-5 py-2 rounded-lg font-bold hover:bg-accent-dark transition-all duration-200 flex items-center justify-center space-x-2 w-full sm:w-auto shadow-md">
                     <i class="fas fa-plus"></i>
                     <span>Tambah Customer</span>
                 </a>
@@ -55,145 +56,146 @@
 
         {{-- Notifikasi --}}
         @if(session('success'))
-            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-lg shadow-sm" role="alert">
-                <p>{{ session('success') }}</p>
+            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-lg shadow-sm flex items-center" role="alert">
+                <i class="fas fa-check-circle mr-3"></i>
+                <p class="font-bold">{{ session('success') }}</p>
             </div>
         @endif
 
         {{-- Statistik --}}
-        @php
-            $totalPartners = $partners->count();
-            $filledContacts = $partners->filter(fn($p) => !empty($p->company_contact))->count();
-            $filledLogos = $partners->filter(fn($p) => !empty($p->logo))->count();
-            $filledCities = $partners->filter(fn($p) => !empty($p->city))->count();
-
-            $towerProviders = $partners->filter(fn($p) => strtoupper($p->sector ?? '') === 'TOWER PROVIDER')->count();
-            $nonTowerProviders = $partners->filter(fn($p) => strtoupper($p->sector ?? '') === 'NON TOWER PROVIDER')->count();
-
-            $otherSectors = $partners->filter(function($p) {
-                $sector = strtoupper($p->sector ?? '');
-                return !empty($sector) && $sector !== 'TOWER PROVIDER' && $sector !== 'NON TOWER PROVIDER';
-            })->count();
-        @endphp
-
         <div class="mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-dark-tower text-white p-4 rounded-lg shadow-md flex items-center space-x-4">
-                <div class="bg-accent-tower text-white rounded-full h-12 w-12 flex items-center justify-center flex-shrink-0">
+            <div class="bg-dark-tower text-white p-4 rounded-xl shadow-md flex items-center space-x-4">
+                <div class="bg-accent-tower text-white rounded-lg h-12 w-12 flex items-center justify-center flex-shrink-0 shadow-inner">
                     <i class="fas fa-users fa-lg"></i>
                 </div>
                 <div>
-                    <p class="text-sm opacity-75">Total Customer</p>
-                    <p class="text-2xl font-bold">{{ $totalPartners }}</p>
+                    <p class="text-xs uppercase font-bold opacity-75">Total Customer</p>
+                    <p class="text-2xl font-black">{{ $partners->count() }}</p>
                 </div>
             </div>
 
-            <div class="bg-gray-50 p-4 rounded-lg shadow-sm flex items-center space-x-4 border border-gray-200">
-                <div class="bg-blue-100 text-blue-600 rounded-full h-12 w-12 flex items-center justify-center flex-shrink-0">
+            <div class="bg-white p-4 rounded-xl shadow-sm flex items-center space-x-4 border border-gray-100">
+                <div class="bg-blue-100 text-blue-600 rounded-lg h-12 w-12 flex items-center justify-center flex-shrink-0">
                     <i class="fas fa-broadcast-tower fa-lg"></i>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-500">TOWER PROVIDER</p>
-                    <p class="text-2xl font-bold text-gray-800">{{ $towerProviders }}</p>
+                    <p class="text-xs uppercase font-bold text-gray-400">Tower Provider</p>
+                    <p class="text-2xl font-black text-gray-800">{{ $partners->filter(fn($p) => strtoupper($p->sector ?? '') === 'TOWER PROVIDER')->count() }}</p>
                 </div>
             </div>
 
-            <div class="bg-gray-50 p-4 rounded-lg shadow-sm flex items-center space-x-4 border border-gray-200">
-                <div class="bg-orange-100 text-orange-600 rounded-full h-12 w-12 flex items-center justify-center flex-shrink-0">
+            <div class="bg-white p-4 rounded-xl shadow-sm flex items-center space-x-4 border border-gray-100">
+                <div class="bg-orange-100 text-orange-600 rounded-lg h-12 w-12 flex items-center justify-center flex-shrink-0">
                     <i class="fas fa-lightbulb fa-lg"></i>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-500">NON TOWER PROVIDER</p>
-                    <p class="text-2xl font-bold text-gray-800">{{ $nonTowerProviders }}</p>
+                    <p class="text-xs uppercase font-bold text-gray-400">Non Tower</p>
+                    <p class="text-2xl font-black text-gray-800">{{ $partners->filter(fn($p) => strtoupper($p->sector ?? '') === 'NON TOWER PROVIDER')->count() }}</p>
                 </div>
             </div>
 
-            <div class="bg-gray-50 p-4 rounded-lg shadow-sm flex items-center space-x-4 border border-gray-200">
-                <div class="bg-gray-200 text-gray-700 rounded-full h-12 w-12 flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-globe-americas fa-lg"></i>
+            <div class="bg-white p-4 rounded-xl shadow-sm flex items-center space-x-4 border border-gray-100">
+                <div class="bg-emerald-100 text-emerald-600 rounded-lg h-12 w-12 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-city fa-lg"></i>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-500">Sektor Lainnya</p>
-                    <p class="text-2xl font-bold text-gray-800">{{ $otherSectors }}</p>
+                    <p class="text-xs uppercase font-bold text-gray-400">Total Kota</p>
+                    <p class="text-2xl font-black text-gray-800">{{ $partners->whereNotNull('city')->unique('city')->count() }}</p>
                 </div>
             </div>
         </div>
 
         {{-- Tabel --}}
-        <div class="overflow-x-auto rounded-lg shadow-lg border border-gray-200 mt-6">
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
             <table class="w-full table-auto border-collapse">
                 <thead>
-                    <tr class="bg-dark-tower text-white uppercase text-sm leading-normal">
-                        <th class="py-3 px-4 text-left w-10">No.</th>
-                        <th class="py-3 px-4 text-left">Nama Customer</th>
-                        <th class="py-3 px-4 text-left">Logo</th>
-                        <th class="py-3 px-4 text-left">Sektor</th>
-                        <th class="py-3 px-4 text-left">Kota</th>
-                        <th class="py-3 px-4 text-left">Tgl Kerja Sama</th>
-                        <th class="py-3 px-4 text-center">Aksi</th>
+                    <tr class="bg-dark-tower text-white uppercase text-[11px] tracking-widest font-black leading-normal">
+                        <th class="py-4 px-4 text-left w-12">No.</th>
+                        <th class="py-4 px-4 text-left">Customer</th>
+                        <th class="py-4 px-4 text-left">Logo</th>
+                        <th class="py-4 px-4 text-left">Sektor</th>
+                        <th class="py-4 px-4 text-left">Kota</th>
+                        <th class="py-4 px-4 text-left">Tgl Kerja Sama</th>
+                        <th class="py-4 px-4 text-center">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="text-gray-700 text-sm font-light" id="partnerTableBody">
+                <tbody class="text-gray-700 text-sm" id="partnerTableBody">
                     @forelse($partners as $partner)
-                        <tr class="border-b border-gray-200 hover:bg-gray-100 transition-colors duration-200 partner-row">
-                            <td class="py-4 px-4 text-left font-medium">{{ $loop->iteration }}</td>
-                            <td class="py-4 px-4 text-left font-semibold">{{ $partner->name }}</td>
+                        <tr class="border-b border-gray-100 hover:bg-slate-50 transition-all duration-200 partner-row">
+                            <td class="py-4 px-4 text-left font-bold text-gray-300">{{ $loop->iteration }}</td>
+                            <td class="py-4 px-4 text-left font-bold text-dark-tower uppercase tracking-tight">{{ $partner->name }}</td>
                             <td class="py-4 px-4 text-left">
                                 @if($partner->logo)
                                     @php
-                                        /**
-                                         * LOGIKA FIX UNTUK HOSTINGER:
-                                         * Kita cek apakah logo sudah ada kata 'partner_logos' (hasil CRUD)
-                                         * atau 'assets/img' (hasil Seeder).
-                                         */
                                         if (str_contains($partner->logo, 'assets/img')) {
                                             $finalLogoPath = asset($partner->logo);
-                                        } elseif (str_contains($partner->logo, 'partner_logos/')) {
-                                            $finalLogoPath = asset('storage/' . $partner->logo);
                                         } else {
-                                            // Fallback jika hanya nama file
-                                            $finalLogoPath = asset('storage/partner_logos/' . $partner->logo);
+                                            $finalLogoPath = asset('storage/' . $partner->logo);
                                         }
                                     @endphp
-                                    <img src="{{ $finalLogoPath }}" alt="Logo" class="w-12 h-12 object-contain rounded-md shadow-sm bg-gray-50 border">
+                                    <img src="{{ $finalLogoPath }}" alt="Logo" class="w-12 h-12 object-contain rounded-lg border border-gray-200 bg-white p-1"
+                                         onerror="this.src='https://via.placeholder.com/50?text=Error'">
                                 @else
-                                    <span class="text-xs text-red-500 italic">No Logo</span>
+                                    <div class="w-12 h-12 flex items-center justify-center bg-gray-100 rounded-lg border border-dashed text-gray-300">
+                                        <i class="fas fa-image"></i>
+                                    </div>
                                 @endif
                             </td>
                             <td class="py-4 px-4 text-left">
                                 @php
                                     $sector = strtoupper($partner->sector ?? '');
-                                    $color = match($sector) {
-                                        'TOWER PROVIDER' => 'bg-blue-100 text-blue-800',
-                                        'NON TOWER PROVIDER' => 'bg-orange-100 text-orange-800',
-                                        default => 'bg-green-100 text-green-800',
+                                    $badgeColor = match($sector) {
+                                        'TOWER PROVIDER' => 'bg-blue-100 text-blue-700 border-blue-200',
+                                        'NON TOWER PROVIDER' => 'bg-orange-100 text-orange-700 border-orange-200',
+                                        default => 'bg-slate-100 text-slate-700 border-slate-200',
                                     };
                                 @endphp
-                                <span class="py-1 px-3 rounded-full text-[10px] font-bold {{ $color }}">
-                                    {{ $sector ?: 'LAINNYA' }}
+                                <span class="py-1 px-3 rounded-full text-[10px] font-black border {{ $badgeColor }}">
+                                    {{ $sector ?: 'OTHERS' }}
                                 </span>
                             </td>
-                            <td class="py-4 px-4 text-left">{{ $partner->city ?? '-' }}</td>
-                            <td class="py-4 px-4 text-left text-xs">
+                            <td class="py-4 px-4 text-left font-medium text-gray-500">{{ $partner->city ?? '-' }}</td>
+                            <td class="py-4 px-4 text-left text-xs font-bold text-gray-400">
                                 {{ $partner->partnership_date ? \Carbon\Carbon::parse($partner->partnership_date)->format('d M Y') : '-' }}
                             </td>
                             <td class="py-4 px-4 text-center">
-                                <div class="flex items-center justify-center space-x-3">
-                                    <a href="{{ route('admin.partners.show', $partner->id) }}" class="text-gray-400 hover:text-blue-500 transition-colors"><i class="fas fa-eye"></i></a>
-                                    <a href="{{ route('admin.partners.edit', $partner->id) }}" class="text-gray-400 hover:text-accent-tower transition-colors"><i class="fas fa-edit"></i></a>
-                                    <form action="{{ route('admin.partners.destroy', $partner->id) }}" method="POST" onsubmit="return confirm('Hapus mitra ini?');" class="inline">
+                                <div class="flex items-center justify-center space-x-2">
+                                    {{-- TOMBOL SHOW --}}
+                                    <a href="{{ route('admin.partners.show', $partner->id) }}"
+                                       class="btn-action bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white"
+                                       title="Lihat Detail">
+                                        <i class="fas fa-eye text-xs"></i>
+                                    </a>
+
+                                    {{-- TOMBOL EDIT --}}
+                                    <a href="{{ route('admin.partners.edit', $partner->id) }}"
+                                       class="btn-action bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white"
+                                       title="Edit Data">
+                                        <i class="fas fa-pencil-alt text-xs"></i>
+                                    </a>
+
+                                    {{-- TOMBOL DELETE --}}
+                                    <form action="{{ route('admin.partners.destroy', $partner->id) }}" method="POST" onsubmit="return confirm('Hapus mitra ini secara permanen?');" class="inline">
                                         @csrf @method('DELETE')
-                                        <button type="submit" class="text-gray-400 hover:text-red-500 transition-colors"><i class="fas fa-trash-alt"></i></button>
+                                        <button type="submit"
+                                                class="btn-action bg-red-50 text-red-600 hover:bg-red-600 hover:text-white"
+                                                title="Hapus Data">
+                                            <i class="fas fa-trash-alt text-xs"></i>
+                                        </button>
                                     </form>
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="py-8 text-center text-gray-500 italic font-poppins">Belum ada data customer yang tersedia.</td>
+                            <td colspan="7" class="py-20 text-center">
+                                <i class="fas fa-folder-open text-gray-200 text-5xl mb-4"></i>
+                                <p class="text-gray-400 font-bold italic">Belum ada data customer tersedia.</p>
+                            </td>
                         </tr>
                     @endforelse
                     <tr id="no-results" class="hidden">
-                         <td colspan="7" class="py-8 text-center text-gray-500">Customer tidak ditemukan.</td>
+                         <td colspan="7" class="py-20 text-center text-gray-400 font-bold">Customer tidak ditemukan.</td>
                     </tr>
                 </tbody>
             </table>

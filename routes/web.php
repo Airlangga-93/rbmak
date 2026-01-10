@@ -162,7 +162,6 @@ Route::prefix('booking')->group(function () {
         Route::post('/riwayat/store', [BookingAuthController::class, 'storeBooking'])->name('booking.riwayat.store');
 
         // --- CHAT SYSTEM ROUTES (USER) ---
-        // Route ini dipanggil oleh JavaScript fetch() di halaman chat user
         Route::get('/chat', [BookingAuthController::class, 'chat'])->name('chat.index');
         Route::post('/chat/send', [BookingAuthController::class, 'sendChat'])->name('chat.send');
         Route::delete('/chat/message/{id}', [BookingAuthController::class, 'deleteMessage'])->name('chat.delete');
@@ -201,11 +200,8 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // --- CHAT SYSTEM ADMIN ---
-    // Endpoint untuk melihat chat spesifik user
     Route::get('/booking/chat/{user_id}', [AdminBookingController::class, 'chat'])->name('booking.chat');
-    // Endpoint pengiriman pesan oleh admin
     Route::post('/booking/chat/send', [AdminBookingController::class, 'sendChat'])->name('chat.send');
-    // Perbaikan: Route delete/update harus mengarah ke controller yang menangani logic admin
     Route::delete('/booking/chat/message/{id}', [AdminBookingController::class, 'deleteMessage'])->name('chat.delete');
     Route::put('/booking/chat/update/{id}', [AdminBookingController::class, 'updateMessage'])->name('chat.update');
 
@@ -232,7 +228,35 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 });
 
 
-// ==================== 4. UTILITIES ====================
+// ==================== 4. STORAGE SYMLINK FIX ====================
+
+/**
+ * Route khusus untuk memperbaiki storage:link di Hostinger
+ * Akses: domainanda.com/foo-link
+ */
+Route::get('/foo-link', function () {
+    $target = base_path('storage/app/public');
+    $link = public_path('storage');
+
+    // Hapus manual folder 'storage' di public_html jika ada (ikon folder biasa bukan shortcut)
+    if (file_exists($link) && !is_link($link)) {
+        app('files')->deleteDirectory($link);
+    }
+
+    try {
+        if (symlink($target, $link)) {
+            return "BERHASIL! Link storage sudah aktif.";
+        } else {
+            return "GAGAL! symlink() PHP tidak diizinkan oleh server.";
+        }
+    } catch (\Exception $e) {
+        return "ERROR: " . $e->getMessage();
+    }
+});
+
+/**
+ * Fallback Route jika akses gambar masih bermasalah
+ */
 Route::get('storage/{path}', function ($path) {
     $storagePath = storage_path('app/public/' . $path);
     if (!Storage::disk('public')->exists($path)) abort(404);

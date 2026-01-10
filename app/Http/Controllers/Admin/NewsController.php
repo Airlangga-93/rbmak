@@ -57,7 +57,7 @@ class NewsController extends Controller
         // Slug dibuat otomatis oleh model News
         News::create($validatedData);
 
-        return redirect()->route('admin.news.index')->with('success', '✅ Berita berhasil ditambahkan!');
+        return redirect()->route('admin.news.index')->with('success', 'Berita berhasil ditambahkan!');
     }
 
     /**
@@ -103,7 +103,7 @@ class NewsController extends Controller
 
         $news->update($validatedData);
 
-        return redirect()->route('admin.news.index')->with('success', '✅ Berita berhasil diperbarui!');
+        return redirect()->route('admin.news.index')->with('success', ' Berita berhasil diperbarui!');
     }
 
     /**
@@ -118,6 +118,6 @@ class NewsController extends Controller
 
         $news->delete();
 
-        return redirect()->route('admin.news.index')->with('success', '🗑️ Berita berhasil dihapus!');
+        return redirect()->route('admin.news.index')->with('success', ' Berita berhasil dihapus!');
     }
 }

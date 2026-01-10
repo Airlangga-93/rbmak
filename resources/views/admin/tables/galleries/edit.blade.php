@@ -30,6 +30,12 @@
         background-color: #E2E8F0;
         color: #1E293B;
     }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
 </style>
 
 <div class="container mx-auto p-6">
@@ -67,31 +73,33 @@
                     <label class="block text-sm font-bold text-dark-tower mb-2 uppercase tracking-widest">Pratinjau Gambar</label>
                     <div class="relative w-full h-64 bg-gray-50 rounded-2xl overflow-hidden border-2 border-dashed border-gray-200 flex items-center justify-center group">
 
-                        {{-- Logika Cek Path Gambar (Sama seperti Index) --}}
+                        {{-- PERBAIKAN LOGIKA PATH (SINKRON DENGAN INDEX & CONTROLLER) --}}
                         @php
-                            $imagePath = '';
                             if($gallery->image) {
-                                if (str_starts_with($gallery->image, 'assets/')) {
+                                if (str_contains($gallery->image, 'assets/')) {
                                     $imagePath = asset($gallery->image);
-                                } elseif (str_starts_with($gallery->image, 'gallery/')) {
-                                    $imagePath = asset('assets/img/' . $gallery->image);
                                 } else {
                                     $imagePath = asset('storage/' . $gallery->image);
                                 }
+                            } else {
+                                $imagePath = null;
                             }
                         @endphp
 
-                        @if($gallery->image)
-                            <img src="{{ $imagePath }}"
-                                 class="w-full h-full object-cover transition duration-500"
-                                 id="current-img"
-                                 alt="{{ $gallery->title }}">
-                        @else
-                            <div class="text-center" id="no-image-placeholder">
-                                <i class="bi bi-image text-gray-300 text-5xl"></i>
-                                <p class="text-gray-400 text-xs mt-2 font-bold uppercase tracking-widest">Tidak ada gambar</p>
-                            </div>
-                        @endif
+                        <div id="image-container" class="w-full h-full flex items-center justify-center">
+                            @if($imagePath)
+                                <img src="{{ $imagePath }}"
+                                     class="w-full h-full object-cover transition duration-500"
+                                     id="current-img"
+                                     alt="{{ $gallery->title }}"
+                                     onerror="this.src='https://placehold.co/600x400?text=Gambar+Tidak+Ditemukan'">
+                            @else
+                                <div class="text-center" id="no-image-placeholder">
+                                    <i class="bi bi-image text-gray-300 text-5xl"></i>
+                                    <p class="text-gray-400 text-xs mt-2 font-bold uppercase tracking-widest">Tidak ada gambar</p>
+                                </div>
+                            @endif
+                        </div>
 
                         <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity pointer-events-none">
                             <span class="text-white text-xs font-bold uppercase tracking-widest">Ganti Gambar Dibawah</span>
@@ -113,7 +121,7 @@
 
                     <div class="mt-3 flex items-start space-x-2 px-1">
                         <i class="bi bi-info-circle-fill text-accent-tower text-xs mt-0.5"></i>
-                        <p class="text-[10px] text-gray-500 leading-tight font-medium uppercase tracking-tight">Kosongkan jika tidak ingin mengganti. Format: JPG, PNG, WEBP (Maks. 4MB).</p>
+                        <p class="text-[10px] text-gray-500 leading-tight font-medium uppercase tracking-tight">Kosongkan jika tidak ingin mengganti. Format: JPG, PNG, WEBP (Maks. 2MB).</p>
                     </div>
                 </div>
 
@@ -138,20 +146,22 @@
 {{-- Script Live Preview --}}
 <script>
     const imageInput = document.getElementById('image');
-    const currentImg = document.getElementById('current-img');
-    const placeholder = document.getElementById('no-image-placeholder');
+    const imageContainer = document.getElementById('image-container');
 
     imageInput.onchange = evt => {
         const [file] = imageInput.files;
         if (file) {
-            // Jika sebelumnya tidak ada gambar, kita buat elemen img
-            if(!currentImg) {
-                location.reload(); // Cara termudah untuk merefresh placeholder menjadi img
-            } else {
-                currentImg.src = URL.createObjectURL(file);
-                currentImg.classList.add('animate-pulse');
-                setTimeout(() => currentImg.classList.remove('animate-pulse'), 1000);
-            }
+            // Hapus isi container (baik img lama atau placeholder)
+            imageContainer.innerHTML = '';
+
+            // Buat elemen img baru
+            const newImg = document.createElement('img');
+            newImg.src = URL.createObjectURL(file);
+            newImg.className = 'w-full h-full object-cover animate-fade-in';
+            newImg.id = 'current-img';
+
+            // Masukkan ke container
+            imageContainer.appendChild(newImg);
         }
     }
 </script>

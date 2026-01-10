@@ -34,13 +34,13 @@
             {{-- 1. Area Tampilan Gambar --}}
             <div class="w-full bg-gray-50 p-4 md:p-8 flex items-center justify-center border-b border-gray-100">
                 @if($gallery->image)
-                    {{-- Logika Deteksi Path Gambar --}}
+                    {{-- PERBAIKAN LOGIKA DETEKSI PATH GAMBAR (SINKRON DENGAN CONTROLLER) --}}
                     @php
-                        if (str_starts_with($gallery->image, 'assets/')) {
+                        if (str_contains($gallery->image, 'assets/')) {
+                            // Jika gambar dari seeder (folder public/assets)
                             $imagePath = asset($gallery->image);
-                        } elseif (str_starts_with($gallery->image, 'gallery/')) {
-                            $imagePath = asset('assets/img/' . $gallery->image);
                         } else {
+                            // Jika gambar dari upload (folder storage/app/public/gallery)
                             $imagePath = asset('storage/' . $gallery->image);
                         }
                     @endphp
@@ -49,6 +49,7 @@
                         <img src="{{ $imagePath }}"
                              class="rounded-2xl shadow-2xl max-w-full h-auto border-4 border-white transition duration-500 group-hover:scale-[1.01]"
                              alt="{{ $gallery->title }}"
+                             onerror="this.onerror=null;this.src='https://placehold.co/800x600?text=Gambar+Tidak+Ditemukan';"
                              style="max-height: 550px; object-fit: contain;">
 
                         {{-- Overlay Badge --}}
@@ -104,7 +105,7 @@
 
     {{-- Footer Info --}}
     <div class="max-w-4xl mx-auto mt-6 text-center">
-        <p class="text-gray-400 text-[10px] font-bold uppercase tracking-[0.3em]">PT. SAYAP SEMBILAN SATU - Panel Administrasi Galeri</p>
+        <p class="text-gray-400 text-[10px] font-bold uppercase tracking-[0.3em]">PT. RBM - Panel Administrasi Galeri</p>
     </div>
 </div>
 

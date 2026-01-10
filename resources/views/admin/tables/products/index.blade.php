@@ -14,10 +14,10 @@
     .bg-accent-tower { background-color: #FF8C00; }
     .hover\:bg-accent-dark:hover { background-color: #E67E22; }
     .shadow-soft { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
-    
+
     /* Perbaikan Efek pada Ikon Aksi */
-    .action-icon { 
-        transition: all 0.2s ease; 
+    .action-icon {
+        transition: all 0.2s ease;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -26,11 +26,11 @@
         border-radius: 8px;
         background-color: #f8f9fa;
     }
-    .action-icon:hover { 
+    .action-icon:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
-    
+
     .stat-card { transition: all 0.3s ease; }
     .stat-card:hover { transform: translateY(-3px); }
 </style>
@@ -43,7 +43,7 @@
             <h1 class="text-2xl font-bold text-dark-tower flex items-center">
                 <i class="fas fa-boxes text-accent-tower mr-3"></i> Daftar Produk
             </h1>
-            
+
             <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
                 <div class="relative w-full sm:w-64">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3">
@@ -162,9 +162,16 @@
                             <td class="py-4 px-6 text-left">
                                 @if($product->image)
                                     @php
-                                        $pathFinal = str_contains($product->image, 'assets/') ? asset($product->image) : asset('storage/' . $product->image);
+                                        // Perbaikan jalur gambar agar mendukung folder 'produk' di dalam storage
+                                        if (str_contains($product->image, 'assets/')) {
+                                            $pathFinal = asset($product->image);
+                                        } elseif (str_contains($product->image, 'produk/')) {
+                                            $pathFinal = asset('storage/' . $product->image);
+                                        } else {
+                                            $pathFinal = asset('storage/produk/' . $product->image);
+                                        }
                                     @endphp
-                                    <img src="{{ $pathFinal }}" alt="{{ $product->name }}" 
+                                    <img src="{{ $pathFinal }}" alt="{{ $product->name }}"
                                          class="w-14 h-14 object-cover rounded-lg border border-gray-100 shadow-sm"
                                          onerror="this.src='https://via.placeholder.com/150?text=No+Image';">
                                 @else
@@ -175,17 +182,14 @@
                             </td>
                             <td class="py-4 px-6 text-center">
                                 <div class="flex items-center justify-center space-x-3">
-                                    {{-- Tombol Detail --}}
                                     <a href="{{ route('admin.products.show', $product->id) }}"
                                        class="action-icon text-gray-400 hover:text-blue-500 hover:bg-blue-50" title="Detail">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    {{-- Tombol Edit --}}
                                     <a href="{{ route('admin.products.edit', $product->id) }}"
                                        class="action-icon text-gray-400 hover:text-orange-500 hover:bg-orange-50" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    {{-- Tombol Hapus --}}
                                     <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk ini?');" class="inline">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="action-icon text-gray-400 hover:text-red-500 hover:bg-red-50" title="Hapus">
@@ -216,7 +220,6 @@
     </div>
 </div>
 
-{{-- Script Aksi Pencarian --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('productSearch');
