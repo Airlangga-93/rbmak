@@ -4,7 +4,8 @@
 
 @section('content')
     {{-- Resource & Fonts --}}
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
@@ -46,14 +47,46 @@
     @endphp
 
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fcfcfc; }
-        .heading-tight { letter-spacing: -0.04em; }
-        .text-orange-main { color: #FF7518; }
-        .bg-orange-main { background-color: #FF7518; }
-        .animate-slow-zoom { animation: slow-zoom 20s infinite ease-in-out; }
-        @keyframes slow-zoom { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        [x-cloak] { display: none !important; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #fcfcfc;
+        }
+
+        .heading-tight {
+            letter-spacing: -0.04em;
+        }
+
+        .text-orange-main {
+            color: #FF7518;
+        }
+
+        .bg-orange-main {
+            background-color: #FF7518;
+        }
+
+        .animate-slow-zoom {
+            animation: slow-zoom 20s infinite ease-in-out;
+        }
+
+        @keyframes slow-zoom {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        [x-cloak] {
+            display: none !important;
+        }
     </style>
 
     {{-- 🌌 1. HERO SLIDER --}}
@@ -106,8 +139,10 @@
                 </div>
                 <div class="text-center lg:text-left">
                     <div class="w-20 h-1.5 bg-orange-main mb-6 mx-auto lg:mx-0"></div>
-                    <h2 class="text-3xl md:text-5xl font-extrabold text-[#161f36] uppercase mb-6">Aset & Armada <br> Terstandarisasi</h2>
-                    <p class="text-gray-500 italic mb-8">Infrastruktur modern dan peralatan kelas industri untuk menjamin presisi setiap proyek.</p>
+                    <h2 class="text-3xl md:text-5xl font-extrabold text-[#161f36] uppercase mb-6">Aset & Armada <br>
+                        Terstandarisasi</h2>
+                    <p class="text-gray-500 italic mb-8">Infrastruktur modern dan peralatan kelas industri untuk menjamin
+                        presisi setiap proyek.</p>
                 </div>
             </div>
         </div>
@@ -117,9 +152,10 @@
     <div x-data="{ activeTab: 'all', search: '' }">
         <section class="py-20 bg-[#fcfcfc]">
             <div class="max-w-7xl mx-auto px-6">
-                
+
                 {{-- Bar Filter --}}
-                <div class="flex flex-col lg:flex-row gap-6 justify-between items-center mb-16 bg-white p-4 rounded-[2.5rem] shadow-sm">
+                <div
+                    class="flex flex-col lg:flex-row gap-6 justify-between items-center mb-16 bg-white p-4 rounded-[2.5rem] shadow-sm">
                     <div class="relative w-full lg:w-1/3">
                         <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-orange-main"></i>
                         <input type="text" x-model="search" placeholder="Cari fasilitas..."
@@ -127,10 +163,18 @@
                     </div>
 
                     <div class="flex gap-2 overflow-x-auto no-scrollbar w-full lg:w-auto">
-                        <button @click="activeTab = 'all'" :class="activeTab === 'all' ? 'bg-[#161f36] text-white' : 'bg-gray-100 text-gray-500'" class="px-8 py-3 rounded-full text-[10px] font-black uppercase whitespace-nowrap transition-all">Semua</button>
-                        <button @click="activeTab = 'pabrikasi'" :class="activeTab === 'pabrikasi' ? 'bg-orange-main text-white' : 'bg-gray-100 text-gray-500'" class="px-8 py-3 rounded-full text-[10px] font-black uppercase whitespace-nowrap transition-all">Pabrikasi</button>
-                        <button @click="activeTab = 'maintenance'" :class="activeTab === 'maintenance' ? 'bg-orange-main text-white' : 'bg-gray-100 text-gray-500'" class="px-8 py-3 rounded-full text-[10px] font-black uppercase whitespace-nowrap transition-all">Maintenance</button>
-                        <button @click="activeTab = 'kendaraan'" :class="activeTab === 'kendaraan' ? 'bg-orange-main text-white' : 'bg-gray-100 text-gray-500'" class="px-8 py-3 rounded-full text-[10px] font-black uppercase whitespace-nowrap transition-all">Kendaraan</button>
+                        <button @click="activeTab = 'all'"
+                            :class="activeTab === 'all' ? 'bg-[#161f36] text-white' : 'bg-gray-100 text-gray-500'"
+                            class="px-8 py-3 rounded-full text-[10px] font-black uppercase whitespace-nowrap transition-all">Semua</button>
+                        <button @click="activeTab = 'pabrikasi'"
+                            :class="activeTab === 'pabrikasi' ? 'bg-orange-main text-white' : 'bg-gray-100 text-gray-500'"
+                            class="px-8 py-3 rounded-full text-[10px] font-black uppercase whitespace-nowrap transition-all">Pabrikasi</button>
+                        <button @click="activeTab = 'maintenance'"
+                            :class="activeTab === 'maintenance' ? 'bg-orange-main text-white' : 'bg-gray-100 text-gray-500'"
+                            class="px-8 py-3 rounded-full text-[10px] font-black uppercase whitespace-nowrap transition-all">Maintenance</button>
+                        <button @click="activeTab = 'kendaraan'"
+                            :class="activeTab === 'kendaraan' ? 'bg-orange-main text-white' : 'bg-gray-100 text-gray-500'"
+                            class="px-8 py-3 rounded-full text-[10px] font-black uppercase whitespace-nowrap transition-all">Kendaraan</button>
                     </div>
                 </div>
 
@@ -161,14 +205,20 @@
                                         <div x-show="search === '' || '{{ strtolower($f->name) }}'.includes(search.toLowerCase())"
                                             class="group bg-white rounded-[2rem] overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500">
                                             <div class="relative aspect-square overflow-hidden bg-gray-200">
-                                                <img src="{{ getFacilityImageUrl($f) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                                                <img src="{{ getFacilityImageUrl($f) }}"
+                                                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                                             </div>
                                             <div class="p-6">
-                                                <h4 class="text-sm font-black text-[#161f36] mb-2 uppercase group-hover:text-orange-main line-clamp-1">{{ $f->name }}</h4>
-                                                <p class="text-gray-400 text-[10px] italic line-clamp-2 mb-6">"{{ $f->description }}"</p>
+                                                <h4
+                                                    class="text-sm font-black text-[#161f36] mb-2 uppercase group-hover:text-orange-main line-clamp-1">
+                                                    {{ $f->name }}</h4>
+                                                <p class="text-gray-400 text-[10px] italic line-clamp-2 mb-6">
+                                                    "{{ $f->description }}"</p>
                                                 <div class="pt-4 border-t border-gray-50 flex justify-between items-center">
-                                                    <span class="text-[9px] font-bold text-gray-300">ID: {{ $f->id }}</span>
-                                                    <a href="{{ route('facilities.show', $f->id) }}" class="w-8 h-8 bg-[#161f36] text-white rounded-xl flex items-center justify-center hover:bg-orange-main transition-all">
+                                                    <span class="text-[9px] font-bold text-gray-300">ID:
+                                                        {{ $f->id }}</span>
+                                                    <a href="{{ route('facilities.show', $f->id) }}"
+                                                        class="w-8 h-8 bg-[#161f36] text-white rounded-xl flex items-center justify-center hover:bg-orange-main transition-all">
                                                         <i class="fas fa-chevron-right text-[10px]"></i>
                                                     </a>
                                                 </div>
@@ -186,9 +236,17 @@
 
     {{-- 📞 5. CTA --}}
     <section class="pb-24 px-6">
-        <div class="max-w-7xl mx-auto bg-[#161f36] rounded-[4rem] p-12 md:p-24 text-center relative overflow-hidden shadow-2xl">
-            <h2 class="text-3xl md:text-6xl font-extrabold text-white mb-8 uppercase">Build with <span class="text-orange-main">Expertise</span></h2>
-            <a href="/contact" class="bg-orange-main text-white px-16 py-5 rounded-[2rem] font-black text-xs uppercase tracking-widest hover:bg-white hover:text-[#161f36] transition-all shadow-xl">Contact Us Now</a>
+        <div
+            class="max-w-7xl mx-auto bg-[#161f36] rounded-[3rem] md:rounded-[4rem] p-10 md:p-24 text-center relative overflow-hidden shadow-2xl">
+            <h2 class="text-3xl md:text-6xl font-extrabold text-white mb-8 uppercase">
+                Build with <span class="text-orange-main">Expertise</span>
+            </h2>
+
+            {{-- Tombol dengan ukuran responsif (px-8 di HP, px-16 di Laptop) --}}
+            <a href="/contact"
+                class="inline-block bg-orange-main text-white px-8 md:px-16 py-4 md:py-5 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-white hover:text-[#161f36] transition-all shadow-xl whitespace-nowrap">
+                Contact Us Now
+            </a>
         </div>
     </section>
 @endsection

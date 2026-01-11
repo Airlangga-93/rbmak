@@ -18,7 +18,7 @@
                 id: 1,
                 cat: 'umum',
                 q: 'DI MANA LOKASI KANTOR PT. RBM?',
-                a: 'Kantor pusat kami berlokasi di Menara Palma Lantai 12, JL. HR. Rasuna Said Kav. 6 Blok X-2, Jakarta Selatan. Dan Second office kami berada di Jl. Cilembu Haur Ngombong (Perempatan Warung Kawat) RT .01, RW .03 Kec.Pamulihan Sumedang 45365. ' }, 
+                a: 'Kantor pusat kami berlokasi di Menara Palma Lantai 12, JL. HR. Rasuna Said Kav. 6 Blok X-2, Jakarta Selatan. Dan Warehouse kami berada di Jl. Cilembu Haur Ngombong (Perempatan Warung Kawat) RT .01, RW .03 Kec.Pamulihan Sumedang 45365. ' }, 
                 { id: 2, cat: 'umum', q: 'APA VISI UTAMA PT. RBM DALAM INDUSTRI INI?', a: 'Menjadi mitra strategis terdepan dalam penyediaan solusi infrastruktur tower dan general trading yang mengedepankan inovasi teknis serta standar keamanan internasional.' },
     
                 {{-- TEKNIS --}} { id: 3, cat: 'teknis', q: 'STANDAR MATERIAL APA YANG DIGUNAKAN PADA TOWER?', a: 'Kami menggunakan baja High-Tensile Grade dengan lapisan Hot Dip Galvanized (HDG) sesuai standar ASTM A123 untuk memastikan ketahanan terhadap korosi hingga 20+ tahun.' },
