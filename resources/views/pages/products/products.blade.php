@@ -9,38 +9,30 @@
 
     @php
         /**
-         * 🛠️ LOGIKA SMART IMAGE HANDLER (Fix for Storage & Seeder)
+         * 🛠️ LOGIKA SMART IMAGE HANDLER
          */
         $getImg = function($path) {
             if (!$path) return 'https://images.unsplash.com/photo-1544380904-c686119ec4f5?q=80&w=2000';
             
-            // 1. Jika URL Luar (http:// atau https://)
             if (filter_var($path, FILTER_VALIDATE_URL)) return $path;
             
-            // 2. Jika Path Seeder (Biasanya diawali 'assets/')
             if (str_starts_with($path, 'assets/')) return asset($path);
             
-            // 3. Jika Path Storage (Upload Admin)
-            // Cek apakah file fisik ada di public/storage/ atau panggil via asset
             return asset('storage/' . $path);
         };
 
-        // Ambil koleksi foto dari data produk yang ada
         $photos = $items->map(fn($item) => $getImg($item->image))->toArray();
 
-        // 🖼️ AMBIL 3 FOTO UNTUK BANNER & GRID (Dinamis dari Produk)
-        // Jika produk < 3, maka akan menggunakan fallback unsplash
         $heroImage1 = $photos[0] ?? 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=2000';
         $heroImage2 = $photos[1] ?? 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=2000';
         $heroImage3 = $photos[2] ?? 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2000';
 
-        // Grid Photos
         $gridPhoto1 = $photos[0] ?? $heroImage1;
         $gridPhoto2 = $photos[1] ?? $heroImage2;
         $gridPhoto3 = $photos[2] ?? $heroImage3;
     @endphp
 
-    {{-- 🌌 1. HERO SLIDER (3 Slides dinamis dari Produk) --}}
+    {{-- 🌌 1. HERO SLIDER --}}
     <section class="relative w-full h-[650px] overflow-hidden bg-[#161f36] font-['Plus_Jakarta_Sans']">
         <div x-data="{ activeSlide: 1, totalSlides: 3 }"
              x-init="setInterval(() => { activeSlide = activeSlide % totalSlides + 1 }, 7000)"
@@ -104,18 +96,23 @@
         </div>
     </div>
 
-    {{-- 🏗️ 3. DYNAMIC GRID SECTION --}}
-    <section class="py-32 bg-white relative overflow-hidden font-['Plus_Jakarta_Sans']">
-        <div class="max-w-7xl mx-auto px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
-                <div class="flex items-end justify-center lg:justify-start gap-4 md:gap-6 relative">
-                    <div class="h-64 w-36 rounded-[2.5rem] overflow-hidden shadow-2xl bg-slate-100 -rotate-3 hover:rotate-0 transition-transform duration-500 border-4 border-white">
+    {{-- 🏗️ 3. DYNAMIC GRID SECTION (PERBAIKAN ESTETIKA FOTO & RESPONSIVE HP) --}}
+    <section class="py-20 lg:py-32 bg-white relative overflow-hidden font-['Plus_Jakarta_Sans']">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+                
+                {{-- FOTO SECTION: Diperbaiki agar rapi di HP dan estetik di Laptop --}}
+                <div class="relative flex justify-center items-center h-[350px] lg:h-[500px]">
+                    <div class="absolute left-0 lg:left-0 w-32 lg:w-44 h-52 lg:h-72 rounded-[2rem] overflow-hidden shadow-xl -rotate-6 z-0 border-4 border-white transition-transform hover:rotate-0 duration-500">
                         <img src="{{ $gridPhoto1 }}" class="h-full w-full object-cover">
                     </div>
-                    <div class="h-[28rem] w-56 rounded-[3rem] overflow-hidden shadow-2xl border-[8px] border-white z-10 bg-slate-100">
-                        <img src="{{ $gridPhoto2 }}" class="h-full w-full object-cover scale-110">
+                    
+                    <div class="absolute z-20 w-48 lg:w-64 h-64 lg:h-[28rem] rounded-[2.5rem] overflow-hidden shadow-2xl border-[6px] lg:border-[10px] border-white ring-1 ring-slate-100">
+                        <img src="{{ $gridPhoto2 }}" class="h-full w-full object-cover scale-105 hover:scale-110 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                     </div>
-                    <div class="h-80 w-40 rounded-[2.5rem] overflow-hidden shadow-2xl bg-slate-100 rotate-3 hover:rotate-0 transition-transform duration-500 border-4 border-white">
+
+                    <div class="absolute right-0 lg:right-10 w-32 lg:w-44 h-52 lg:h-72 rounded-[2rem] overflow-hidden shadow-xl rotate-6 z-10 border-4 border-white transition-transform hover:rotate-0 duration-500">
                         <img src="{{ $gridPhoto3 }}" class="h-full w-full object-cover">
                     </div>
                 </div>
@@ -131,7 +128,7 @@
                     <p class="text-slate-500 leading-relaxed font-medium text-lg max-w-xl mx-auto lg:mx-0">
                         Kami mengintegrasikan teknologi terkini dengan material grade-A untuk memastikan aset telekomunikasi Anda bertahan puluhan tahun.
                     </p>
-                    <div class="space-y-4 pt-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
                         <div class="flex items-center justify-center lg:justify-start gap-4 font-black text-[#161f36] text-sm uppercase tracking-tight group cursor-default">
                             <span class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-[#FF7518] shadow-sm group-hover:bg-[#FF7518] group-hover:text-white transition-all duration-300">
                                 <i class="fas fa-shield-halved"></i>
@@ -229,7 +226,7 @@
                 <div class="pt-4">
                     <a href="{{ route('booking.index') }}" class="inline-flex items-center gap-4 bg-[#FF7518] text-white px-14 py-6 rounded-[2rem] font-black text-[11px] uppercase tracking-[0.3em] hover:bg-white hover:text-[#161f36] transition-all duration-500 shadow-2xl shadow-orange-600/30">
                         <i class="fas fa-calendar-check"></i>
-                        Book Project Nowa
+                        Book Project Now
                     </a>
                 </div>
             </div>
