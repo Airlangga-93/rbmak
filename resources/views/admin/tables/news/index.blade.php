@@ -92,7 +92,12 @@
                                 <th class="py-3 px-6 text-left w-16">No.</th>
                                 <th class="py-3 px-6 text-left">Judul</th>
                                 <th class="py-3 px-6 text-left">Gambar</th>
+
+                                {{-- =================================== --}}
+                                {{-- 1. HEADER TABEL "TIPE" --}}
+                                {{-- =================================== --}}
                                 <th class="py-3 px-6 text-left">Tipe</th>
+
                                 <th class="py-3 px-6 text-left">Deskripsi</th>
                                 <th class="py-3 px-6 text-left">Penerbit</th>
                                 <th class="py-3 px-6 text-left">Tanggal</th>
@@ -105,11 +110,8 @@
                                     <td class="py-4 px-6 text-left font-medium">{{ $loop->iteration }}</td>
                                     <td class="py-4 px-6 text-left font-semibold break-words">{{ $item->title }}</td>
                                     <td class="py-4 px-6 text-left">
-                                        {{-- PERBAIKAN: Jalur langsung ke folder fisik --}}
-                                        <img src="/storage/app/public/news_images/{{ $item->image }}"
-                                             alt="{{ $item->title }}"
-                                             class="w-16 h-16 object-cover rounded-md shadow-sm bg-gray-50"
-                                             onerror="this.onerror=null;this.src='{{ asset('assets/img/no-image.png') }}';">
+                                        <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->title }}"
+                                            class="w-16 h-16 object-cover rounded-md shadow-sm bg-gray-50">
                                     </td>
 
                                     <td class="py-4 px-6 text-left text-xs">
@@ -118,8 +120,10 @@
                                         </code>
                                     </td>
 
+                                    {{-- PERBAIKAN DESKRIPSI DI SINI --}}
                                     <td class="py-4 px-6 text-left max-w-xs">
                                         <div class="text-gray-500 italic">
+                                            {{-- strip_tags menghapus tag HTML agar tabel tidak rusak, Str::limit membatasi panjang teks --}}
                                             {{ Str::limit(strip_tags($item->description), 50, '...') }}
                                         </div>
                                     </td>
@@ -155,7 +159,8 @@
                                 </tr>
                             @empty
                                 <tr id="no-data">
-                                    <td colspan="8" class="py-8 text-center text-gray-500">Belum ada berita yang ditambahkan.</td>
+                                    <td colspan="8" class="py-8 text-center text-gray-500">Belum ada berita yang
+                                        ditambahkan.</td>
                                 </tr>
                             @endforelse
                             <tr id="no-results" class="hidden">
@@ -171,14 +176,16 @@
             document.addEventListener('DOMContentLoaded', function() {
                 const searchInput = document.getElementById('searchInput');
                 const tableBody = document.getElementById('newsTableBody');
-                const allRows = tableBody.querySelectorAll('tr:not(#no-results):not(#no-data)');
+                const allRows = tableBody.querySelectorAll('tr:not(#no-results)');
                 const noResultsRow = document.getElementById('no-results');
+                const noDataRow = document.getElementById('no-data');
 
                 searchInput.addEventListener('keyup', function(e) {
                     const searchTerm = e.target.value.toLowerCase();
                     let visibleRows = 0;
 
                     allRows.forEach(row => {
+                        // Kolom "Judul" adalah kolom kedua (index 1)
                         const newsTitleCell = row.cells[1];
                         if (newsTitleCell) {
                             const newsTitle = newsTitleCell.textContent.toLowerCase();
@@ -191,10 +198,11 @@
                         }
                     });
 
-                    if (visibleRows === 0 && allRows.length > 0) {
-                        noResultsRow.classList.remove('hidden');
+                    // Tampilkan pesan "tidak ditemukan" jika tidak ada baris yang cocok
+                    if (visibleRows === 0 && !noDataRow) {
+                        noResultsRow.style.display = '';
                     } else {
-                        noResultsRow.classList.add('hidden');
+                        noResultsRow.style.display = 'none';
                     }
                 });
             });
