@@ -57,31 +57,28 @@
 
 <body x-data="{
     mobileMenu: false,
-    editorOpen: {{ collect([
-        'admin.abouts.*',
-        'admin.news.*',
-        'admin.products.*',
-        'admin.facilities.*',
-        'admin.galleries.*',
-        'admin.partners.*',
-        'admin.testimonials.*',
-        'admin.feedbacks.*',
-    ])->contains(fn($r) => request()->routeIs($r))
-        ? 'true'
-        : 'false' }}
+    editorOpen: {{ (
+        request()->routeIs('admin.abouts.*') ||
+        request()->routeIs('admin.news.*') ||
+        request()->routeIs('admin.products.*') ||
+        request()->routeIs('admin.facilities.*') ||
+        request()->routeIs('admin.galleries.*') ||
+        request()->routeIs('admin.partners.*') ||
+        request()->routeIs('admin.testimonials.*') ||
+        request()->routeIs('admin.feedbacks.*') ||
+        request()->routeIs('admin.booking.list')
+    ) ? 'true' : 'false' }}
 }" class="antialiased overflow-x-hidden">
 
-    <template x-if="mobileMenu">
-        <div x-show="mobileMenu"
-             x-transition:enter="transition opacity-0 ease-out duration-300"
-             x-transition:enter-start="opacity-0"
-             x-transition:enter-end="opacity-100"
-             x-transition:leave="transition opacity-100 ease-in duration-200"
-             x-transition:leave-start="opacity-100"
-             x-transition:leave-end="opacity-0"
-             @click="mobileMenu = false"
-             class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[45] lg:hidden"></div>
-    </template>
+    <div x-show="mobileMenu"
+         x-transition:enter="transition opacity-0 ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition opacity-100 ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @click="mobileMenu = false"
+         class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[45] lg:hidden" x-cloak></div>
 
     <aside :class="mobileMenu ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
         class="sidebar-transition fixed top-0 left-0 h-screen bg-[var(--sidebar-bg)] border-r border-slate-200 z-[50] flex flex-col shadow-2xl lg:shadow-none w-[280px]">
@@ -191,7 +188,6 @@
 
     <main class="main-content min-h-screen pt-20 lg:pt-0">
         <div class="p-6 md:p-8 lg:p-10 max-w-[1600px] mx-auto">
-
             @if(session('success'))
             <div class="mb-6 p-4 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-2xl flex items-center gap-3 text-sm animate-in fade-in slide-in-from-top-4 duration-300">
                 <i class="bi bi-check-circle-fill"></i>
@@ -205,16 +201,7 @@
         </div>
     </main>
 
-    <script>
-        // Smooth transition for sidebar on mobile when resizing window
-        window.addEventListener('resize', () => {
-            if (window.innerWidth >= 1024) {
-                // Ensure mobile menu state doesn't interfere with desktop layout
-                // (Optional: can be handled by Alpine)
-            }
-        });
-    </script>
-
     @yield('scripts')
 </body>
+
 </html>
