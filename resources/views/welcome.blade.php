@@ -67,208 +67,122 @@
         $amaliahOrange = $rbmOrange;
         $amaliahDark = $rbmDark;
     @endphp
+{{-- ================= MODAL NEWS STACK (MINIMALIST) ================= --}}
+@if ($latestNews->isNotEmpty())
+    @php
+        // Mengambil maksimal 3 berita terbaru
+        $newsList = $latestNews->take(3);
+    @endphp
 
-    {{-- ================= MODAL NEWS (POPUP) ================= --}}
-    @if ($latestNews->isNotEmpty())
-        <div x-data="{
+    <div x-data="{
             currentIndex: 0,
-            newsCount: {{ $latestNews->count() }},
+            newsCount: {{ $newsList->count() }},
             showModal: false,
-        
+
             init() {
-                // Muncul jika session belum ada
+                // Muncul sekali per session browser
                 if (!sessionStorage.getItem('news_popup_session')) {
                     setTimeout(() => {
                         this.showModal = true;
                         sessionStorage.setItem('news_popup_session', 'shown');
-                    }, 1000);
+                    }, 1200);
                 }
             },
-        
-            next() {
-                this.currentIndex++;
-                if (this.currentIndex >= this.newsCount) {
+
+            // Fungsi navigasi dipicu saat klik silang
+            handleClose() {
+                if (this.currentIndex + 1 >= this.newsCount) {
                     this.showModal = false;
+                } else {
+                    this.currentIndex++;
                 }
-            },
-        
-            closeAll() {
-                this.showModal = false;
             }
-        }" x-show="showModal" x-cloak
-            class="fixed inset-0 z-[110] flex items-center justify-center p-4">
+        }"
+        x-show="showModal"
+        x-cloak
+        class="fixed inset-0 z-[1000] flex items-center justify-center p-6">
 
-            {{-- OVERLAY --}}
-            <div @click="closeAll()" class="fixed inset-0 bg-[#161f36]/60 backdrop-blur-sm transition-opacity">
-            </div>
-
-            {{-- MODAL CARD --}}
-            <div class="relative w-full max-w-md">
-                @foreach ($latestNews as $index => $news)
-                    <div x-show="currentIndex === {{ $index }}" x-transition:enter="transition ease-out duration-500"
-                        x-transition:enter-start="opacity-0 scale-90 translate-y-8"
-                        x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                        class="bg-white rounded-[32px] shadow-2xl overflow-hidden border border-white/20">
-
-                        {{-- IMAGE --}}
-                        <div class="relative h-60 bg-gray-100">
-                            @if (!empty($news->image))
-                                <img src="{{ asset('storage/' . $news->image) }}" alt="{{ $news->title }}"
-                                    class="w-full h-full object-cover">
-                            @endif
-
-                            {{-- CLOSE BUTTON --}}
-                            <button @click="closeAll()"
-                                class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-white/90 text-gray-800 hover:bg-red-500 hover:text-white transition-all shadow-lg">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
-
-                            {{-- PROGRESS BARS --}}
-                            <div class="absolute bottom-4 left-6 flex gap-2">
-                                @for ($i = 0; $i < $latestNews->count(); $i++)
-                                    <div
-                                        class="h-1.5 rounded-full transition-all duration-500
-                                        {{ $i === $index ? 'w-10 bg-[#FF7518]' : 'w-2 bg-white/50' }}">
-                                    </div>
-                                @endfor
-                            </div>
-                        </div>
-
-                        {{-- CONTENT --}}
-                        <div class="p-8">
-                            <span
-                                class="px-2 py-0.5 rounded bg-orange-50 text-[10px] font-bold text-[#FF7518] tracking-widest uppercase">
-                                Update Terbaru
-                            </span>
-
-                            <h3 class="text-xl font-black text-[#161f36] leading-tight mt-3 mb-3">
-                                {{ $news->title ?? 'Judul Berita' }}
-                            </h3>
-
-                            <p class="text-sm text-gray-500 mb-8 line-clamp-3">
-                                {{ Str::limit(strip_tags($news->content ?? ''), 120) }}
-                            </p>
-
-                            <div class="flex items-center justify-between border-t border-gray-100 pt-5">
-                                <a href="{{ route('news.show', $news->slug ?? $news->id) }}"
-                                    class="inline-flex items-center gap-2 text-sm font-bold text-[#FF7518] hover:gap-3 transition-all">
-                                    Baca Selengkapnya <i class="fa-solid fa-arrow-right-long"></i>
-                                </a>
-
-                                <button @click="next()"
-                                    class="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] hover:text-[#161f36] transition-colors">
-                                    {{ $index + 1 === $latestNews->count() ? 'Selesai' : 'Lanjut' }}
-                                </button>
-                            </div>
-                        </div>
-
-                    </div>
-                @endforeach
-            </div>
+        {{-- Background Overlay (Glassmorphism) --}}
+        <div x-show="showModal"
+             x-transition:enter="transition ease-out duration-500"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-300"
+             class="fixed inset-0 bg-slate-900/40 backdrop-blur-md">
         </div>
-    @endif
 
+        {{-- Card Container --}}
+        <div class="relative w-full max-w-sm">
+            @foreach ($newsList as $index => $news)
+                <div x-show="currentIndex === {{ $index }}"
+                     x-transition:enter="transition cubic-bezier(0.34, 1.56, 0.64, 1) duration-600"
+                     x-transition:enter-start="opacity-0 scale-90 translate-y-12 rotate-2"
+                     x-transition:enter-end="opacity-100 scale-100 translate-y-0 rotate-0"
+                     x-transition:leave="transition ease-in duration-300 absolute inset-0"
+                     x-transition:leave-start="opacity-100 scale-100"
+                     x-transition:leave-end="opacity-0 scale-90 -translate-y-12"
+                     class="bg-white rounded-[35px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.2)] overflow-hidden border border-slate-100">
 
-
-    {{-- ================= MODAL NEWS (SESSION BASED) ================= --}}
-    @if ($latestNews->isNotEmpty())
-        <div x-data="{
-            currentIndex: 0,
-            newsCount: {{ $latestNews->count() }},
-            showModal: false,
-        
-            init() {
-                if (!sessionStorage.getItem('news_popup_session')) {
-                    setTimeout(() => {
-                        this.showModal = true;
-                        sessionStorage.setItem('news_popup_session', 'shown');
-                    }, 800);
-                }
-            },
-        
-            next() {
-                this.currentIndex++;
-                if (this.currentIndex >= this.newsCount) {
-                    this.showModal = false;
-                }
-            },
-        
-            closeAll() {
-                this.showModal = false;
-            }
-        }" x-show="showModal" x-cloak
-            class="fixed inset-0 z-[110] flex items-center justify-center p-4">
-
-            {{-- OVERLAY --}}
-            <div @click="closeAll()" class="fixed inset-0 bg-[#161f36]/50">
-            </div>
-
-            {{-- CARD --}}
-            <div class="relative w-full max-w-md">
-                @foreach ($latestNews as $index => $news)
-                    <div x-show="currentIndex === {{ $index }}"
-                        x-transition:enter="transition ease-out duration-500"
-                        x-transition:enter-start="opacity-0 scale-90 translate-y-6"
-                        x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                        class="bg-white rounded-[28px] shadow-2xl overflow-hidden">
-
-                        {{-- IMAGE --}}
-                        <div class="relative h-56 bg-gray-100">
-                            @if (!empty($news->image))
-                                <img src="{{ asset('storage/' . $news->image) }}" alt="{{ $news->title }}"
-                                    class="w-full h-full object-cover">
-                            @endif
-
-                            {{-- CLOSE / NEXT --}}
-                            <button @click="next()"
-                                class="absolute top-4 right-4 w-9 h-9 flex items-center justify-center
-                               rounded-full bg-white/90 hover:bg-red-500 hover:text-white
-                               transition shadow">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
-
-                            {{-- PROGRESS INDICATOR --}}
-                            <div class="absolute bottom-4 left-5 flex gap-1.5">
-                                @for ($i = 0; $i < $latestNews->count(); $i++)
-                                    <div
-                                        class="h-1.5 rounded-full transition-all duration-500
-                                {{ $i === $index ? 'w-8 bg-[#FF7518]' : 'w-2 bg-white/50' }}">
-                                    </div>
-                                @endfor
+                    {{-- Image Section --}}
+                    <div class="relative h-60 bg-slate-50 overflow-hidden">
+                        @if (!empty($news->image))
+                            <img src="{{ asset('storage/' . $news->image) }}"
+                                 alt="{{ $news->title }}"
+                                 class="w-full h-full object-cover">
+                        @else
+                            <div class="w-full h-full flex items-center justify-center bg-slate-100">
+                                <i class="fa-regular fa-image text-slate-200 text-5xl"></i>
                             </div>
-                        </div>
+                        @endif
 
-                        {{-- CONTENT --}}
-                        <div class="p-7">
-                            <span class="text-[10px] font-bold text-[#FF7518] tracking-widest uppercase">
-                                Info Terkini
+                        {{-- Close Button (Trigger Next News) --}}
+                        <button @click="handleClose()"
+                                class="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 text-white backdrop-blur-md transition-all z-10 border border-white/30 active:scale-90">
+                            <i class="fa-solid fa-xmark text-lg"></i>
+                        </button>
+
+                        {{-- News Indicator (Contoh: 1/3) --}}
+                        <div class="absolute bottom-6 left-8">
+                             <span class="px-3 py-1 rounded-full bg-black/20 backdrop-blur-md text-[10px] font-black text-white uppercase tracking-[0.2em] border border-white/10">
+                                Berita {{ $index + 1 }} / {{ $newsList->count() }}
                             </span>
+                        </div>
+                    </div>
 
-                            <h3 class="text-xl font-bold mt-2 mb-3 text-[#161f36] leading-tight">
-                                {{ $news->title ?? '-' }}
-                            </h3>
-
-                            <p class="text-sm text-gray-500 mb-6 line-clamp-2">
-                                {{ Str::limit(strip_tags($news->content ?? ''), 110) }}
-                            </p>
-
-                            <div class="flex items-center justify-between border-t pt-4">
-                                <a href="{{ route('news.show', $news->slug ?? $news->id) }}"
-                                    class="text-sm font-bold text-[#FF7518] hover:underline">
-                                    Baca Artikel
-                                </a>
-
-                                <button @click="next()" class="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                                    {{ $index + 1 === $latestNews->count() ? 'Tutup' : 'Lanjut' }}
-                                </button>
-                            </div>
+                    {{-- Content Section --}}
+                    <div class="p-8 sm:p-10">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></div>
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Pembaruan</span>
                         </div>
 
+                        <h3 class="text-xl font-bold text-slate-800 leading-tight mb-4">
+                            {{ $news->title }}
+                        </h3>
+
+                        <p class="text-slate-500 text-sm leading-relaxed mb-8 line-clamp-3 font-medium">
+                            {{ Str::limit(strip_tags($news->content), 120) }}
+                        </p>
+
+                        {{-- Action Link --}}
+                        <div class="flex items-center justify-between">
+                            <a href="{{ route('news.show', $news->slug ?? $news->id) }}"
+                               class="group text-sm font-bold text-slate-900 flex items-center gap-2 transition-all">
+                                Lihat Detail
+                                <i class="fa-solid fa-arrow-right-long text-orange-500 group-hover:translate-x-1 transition-transform"></i>
+                            </a>
+
+                            {{-- Petunjuk kecil --}}
+                            <span class="text-[9px] font-bold text-slate-300 uppercase tracking-widest">
+                                Klik X untuk lanjut
+                            </span>
+                        </div>
                     </div>
-                @endforeach
-            </div>
+                </div>
+            @endforeach
         </div>
-    @endif
+    </div>
+@endif
 
     {{-- ================= HERO SLIDER (DATA DARI GALLERY) ================= --}}
     <section class="relative h-[85vh] min-h-[600px] overflow-hidden bg-[#161f36]">
