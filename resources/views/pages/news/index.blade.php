@@ -160,25 +160,18 @@
     </section>
 
     {{-- ===================== ✉️ NEWSLETTER SECTION ===================== --}}
-    <section class="max-w-screen-xl mx-auto px-6 pb-24">
+    <section class="max-w-screen-xl mx-auto px-6 pb-24 text-center">
         <div class="bg-[#161f36] rounded-[3rem] p-10 lg:p-16 relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-1/2 h-full bg-[#FF7518]/10 skew-x-12 translate-x-20"></div>
-            <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
-                <div class="lg:w-1/2 text-center lg:text-left">
-                    <h2 class="text-3xl lg:text-4xl font-black text-white uppercase tracking-tighter mb-4">
-                        Tetap <span class="text-[#FF7518]">Terhubung</span>
-                    </h2>
-                    <p class="text-gray-400">Dapatkan update mingguan mengenai proyek dan teknologi terbaru langsung ke email Anda.</p>
-                </div>
-                <div class="lg:w-1/2 w-full">
-                    <form class="flex flex-col sm:flex-row gap-4">
-                        <input type="email" placeholder="Alamat Email Anda"
-                               class="flex-grow bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-[#FF7518] transition">
-                        <button class="bg-[#FF7518] text-white font-black uppercase tracking-widest px-8 py-4 rounded-2xl hover:bg-white hover:text-[#161f36] transition duration-300 shadow-lg shadow-[#FF7518]/20">
-                            Subscribe
-                        </button>
-                    </form>
-                </div>
+            {{-- Background Accent --}}
+            <div class="absolute top-0 left-1/2 w-full h-full bg-[#FF7518]/10 -translate-x-1/2 skew-y-6"></div>
+            
+            <div class="relative z-10 max-w-2xl mx-auto">
+                <h2 class="text-3xl lg:text-4xl font-black text-white uppercase tracking-tighter mb-4">
+                    Tetap <span class="text-[#FF7518]">Terhubung</span>
+                </h2>
+                <p class="text-gray-400">
+                    Nantikan informasi dan update terbaru mengenai proyek serta inovasi teknologi dari kami melalui platform Lensa RBM.
+                </p>
             </div>
         </div>
     </section>
