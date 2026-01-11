@@ -12,14 +12,14 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
             --primary: #FF7518;
             --sidebar-bg: #FCFDFE;
             --main-bg: #F2F4F8;
+            --sidebar-width: 280px;
         }
 
         body {
@@ -35,21 +35,21 @@
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Scrollbar styling */
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background: #E2E8F0;
             border-radius: 10px;
         }
 
-        /* Logic for Main Content Responsiveness */
+        /* Perbaikan Presisi Layout Utama */
         .main-content {
-            transition: margin-left 0.3s ease;
+            transition: padding-left 0.3s ease;
+            width: 100%;
         }
 
         @media (min-width: 1024px) {
             .main-content {
-                margin-left: 280px;
+                padding-left: var(--sidebar-width);
             }
         }
     </style>
@@ -72,11 +72,6 @@
 
     <div x-show="mobileMenu"
          x-transition:enter="transition opacity-0 ease-out duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition opacity-100 ease-in duration-200"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
          @click="mobileMenu = false"
          class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[45] lg:hidden" x-cloak></div>
 
@@ -181,13 +176,13 @@
             <img src="{{ asset('assets/img/image.png') }}" class="w-8 h-8 rounded-lg shadow-sm">
             <span class="font-black text-xs tracking-tight uppercase text-slate-800">PT RIZQALLAH</span>
         </div>
-        <button @click="mobileMenu = true" class="p-2 bg-slate-50 rounded-xl border border-slate-100 text-slate-600 active:bg-slate-100">
+        <button @click="mobileMenu = true" class="p-2 bg-slate-50 rounded-xl border border-slate-100 text-slate-600">
             <i class="bi bi-list text-2xl"></i>
         </button>
     </header>
 
-    <main class="main-content min-h-screen pt-20 lg:pt-0">
-        <div class="p-6 md:p-8 lg:p-10 max-w-[1600px] mx-auto">
+    <main class="main-content min-h-screen">
+        <div class="p-6 md:p-8 lg:p-10 pt-20 lg:pt-10 max-w-[1600px]">
             @if(session('success'))
             <div class="mb-6 p-4 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-2xl flex items-center gap-3 text-sm animate-in fade-in slide-in-from-top-4 duration-300">
                 <i class="bi bi-check-circle-fill"></i>
