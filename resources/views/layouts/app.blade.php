@@ -71,9 +71,7 @@
     </div>
 
     @php
-        $rbmDarkColor = '#161f36';
         $whatsappNumber = '6281394884596';
-        $whatsappMessage = 'Halo PT. Rizqallah Boer Makmur, saya ingin bertanya tentang layanan Anda.';
     @endphp
 
     <div x-data="{ searchModalOpen: false, mobileMenuOpen: false }" @keydown.escape.window="searchModalOpen = false">
@@ -177,6 +175,9 @@
                     <a href="{{ route('news.index') }}" class="block px-4 py-3 text-gray-700 font-bold text-[13px] uppercase {{ Request::is('news*') ? 'text-rbm-accent' : '' }}">Berita</a>
                     <a href="{{ route('facilities.index') }}" class="block px-4 py-3 text-gray-700 font-bold text-[13px] uppercase">Fasilitas</a>
                     <a href="{{ route('kontak') }}" class="block px-4 py-3 text-gray-700 font-bold text-[13px] uppercase">Kontak</a>
+
+                    {{-- FIXED: MENU FEEDBACK UNTUK MOBILE --}}
+                    <a href="{{ route('feedback.create') }}" class="block px-4 py-3 text-gray-700 font-bold text-[13px] uppercase {{ Request::is('feedback*') ? 'text-rbm-accent' : '' }}">Feedback</a>
 
                     <div x-data="{ open: false }">
                         <button @click="open = !open" class="w-full flex justify-between items-center px-4 py-3 text-gray-700 font-bold text-[13px] uppercase">

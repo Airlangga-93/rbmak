@@ -58,7 +58,6 @@
 <body x-data="{
     mobileMenu: false,
     editorOpen: {{ (
-        request()->routeIs('admin.abouts.*') ||
         request()->routeIs('admin.news.*') ||
         request()->routeIs('admin.products.*') ||
         request()->routeIs('admin.facilities.*') ||
@@ -122,14 +121,12 @@
                 <div x-show="editorOpen" x-collapse x-cloak class="mt-1 ml-4 border-l-2 border-slate-100 space-y-1">
                     @php
                         $submenus = [
-                            ['route' => 'admin.abouts.index', 'icon' => 'bi-info-circle', 'label' => 'Tentang Kami'],
                             ['route' => 'admin.news.index', 'icon' => 'bi-newspaper', 'label' => 'Berita & Artikel'],
                             ['route' => 'admin.products.index', 'icon' => 'bi-box-seam', 'label' => 'Produk & Jasa'],
                             ['route' => 'admin.galleries.index', 'icon' => 'bi-images', 'label' => 'Galeri Foto'],
                             ['route' => 'admin.partners.index', 'icon' => 'bi-hand-thumbs-up', 'label' => 'Our Customer'],
                             ['route' => 'admin.testimonials.index', 'icon' => 'bi-chat-quote', 'label' => 'Testimoni'],
                             ['route' => 'admin.feedbacks.index', 'icon' => 'bi-envelope-paper', 'label' => 'Feedback'],
-                            ['route' => 'admin.booking.list', 'icon' => 'bi-calendar2-check', 'label' => 'Daftar Booking'],
                             ['route' => 'admin.facilities.index', 'icon' => 'bi-building-gear', 'label' => 'Fasilitas'],
                         ];
                     @endphp
@@ -146,6 +143,14 @@
             <div class="text-[10px] font-black uppercase text-slate-400 px-3 py-6 tracking-[2px]">
                 Komunikasi
             </div>
+
+
+             <a href="{{ route('admin.booking.list') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all
+                {{ request()->routeIs('admin.booking.list') ? 'bg-orange-50 text-[var(--primary)] font-bold shadow-sm' : 'text-slate-500 hover:bg-slate-50' }}">
+                <i class="bi bi-chat-dots-fill"></i>
+                <span class="text-sm">Daftar Booking</span>
+            </a>
 
             <a href="{{ route('admin.booking.index') }}"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all

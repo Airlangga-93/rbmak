@@ -9,8 +9,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Mail; // Tambahkan Mail
-use App\Mail\AdminChatNotification; // Tambahkan Mailable
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AdminChatNotification;
 
 class AdminBookingController extends Controller
 {
@@ -57,7 +57,7 @@ class AdminBookingController extends Controller
     }
 
     /**
-     * HALAMAN CHAT ADMIN (LOGIKA TAMPILAN)
+     * HALAMAN CHAT ADMIN
      */
     public function chat($user_id, Request $request)
     {
@@ -70,11 +70,10 @@ class AdminBookingController extends Controller
             $q->where('sender_id', $user->id)->where('receiver_id', $adminId);
         })->orderBy('created_at')->get();
 
-        $formattedMessages = $messages->map(function ($m) use ($adminId) {
+        $formattedMessages = $messages->map(function ($m) {
             return [
                 'id' => $m->id,
-                'text' => $m->message,
-                // Gunakan disk cloudinary agar gambar muncul di internet
+                'text' => $m->message ?? '',
                 'image' => $m->image ? Storage::disk('cloudinary')->url($m->image) : null,
                 'is_me' => $m->sender_type === 'admin',
                 'time' => $m->created_at->setTimezone('Asia/Jakarta')->format('H:i'),
@@ -86,11 +85,13 @@ class AdminBookingController extends Controller
             return response()->json($formattedMessages);
         }
 
+        // Mark as read
         Message::where('sender_id', $user->id)
             ->where('receiver_id', $adminId)
             ->where('is_read', false)
             ->update(['is_read' => true]);
 
+        // List active chats
         $userIds = Booking::pluck('user_id')->unique();
         $active_chats = User::whereIn('id', $userIds)->get()->map(function ($u) use ($adminId) {
             $lastMsg = Message::where(function ($q) use ($u, $adminId) {
@@ -99,12 +100,12 @@ class AdminBookingController extends Controller
                 $q->where('sender_id', $u->id)->where('receiver_id', $adminId);
             })->latest()->first();
 
-            $u->latest_msg_text = $lastMsg?->message ?? 'Belum ada percakapan';
+            $u->latest_msg_text = $lastMsg?->message ?? ($lastMsg?->image ? '📷 Foto' : 'Belum ada percakapan');
             $u->last_interaction = $lastMsg?->created_at ?? $u->created_at;
             $u->unread_count = Message::where('sender_id', $u->id)
                 ->where('receiver_id', $adminId)->where('is_read', false)->count();
             return $u;
-        })->sortByDesc('last_interaction');
+        })->sortByDesc('last_interaction')->values();
 
         $activeBooking = Booking::where('user_id', $user->id)->latest()->first();
 
@@ -112,55 +113,69 @@ class AdminBookingController extends Controller
     }
 
     /**
-     * KIRIM PESAN DARI ADMIN KE USER
+     * KIRIM PESAN (LOGIKA PERBAIKAN FOTO)
      */
     public function sendChat(Request $request)
     {
+        // Validasi diperketat: Harus ada teks ATAU ada gambar
         $request->validate([
-            'message' => 'required_without:image|nullable|string|max:1000',
-            'image' => 'nullable|image|max:5120',
+            'message' => 'required_if:image,null|nullable|string|max:1000',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'receiver_id' => 'required|exists:users,id',
         ]);
 
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('chats', 'cloudinary');
+        try {
+            $imagePath = null;
+            if ($request->hasFile('image')) {
+                // Proses upload ke Cloudinary
+                $imagePath = $request->file('image')->store('chats', 'cloudinary');
+            }
+
+            $msg = Message::create([
+                'sender_id' => Auth::id(),
+                'receiver_id' => $request->receiver_id,
+                'message' => $request->message ?? '', // Simpan string kosong jika hanya kirim gambar
+                'image' => $imagePath,
+                'sender_type' => 'admin',
+                'is_read' => false,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => [
+                    'id' => $m->id ?? $msg->id,
+                    'text' => $msg->message,
+                    'image' => $msg->image ? Storage::disk('cloudinary')->url($msg->image) : null,
+                    'is_me' => true,
+                    'time' => $msg->created_at->setTimezone('Asia/Jakarta')->format('H:i'),
+                    'is_edited' => false,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Gagal memproses pesan: ' . $e->getMessage()
+            ], 500);
         }
-
-        $msg = Message::create([
-            'sender_id' => Auth::id(),
-            'receiver_id' => $request->receiver_id,
-            'message' => $request->message,
-            'image' => $imagePath,
-            'sender_type' => 'admin',
-            'is_read' => false,
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => [
-                'id' => $msg->id,
-                'text' => $msg->message,
-                'image' => $msg->image ? Storage::disk('cloudinary')->url($msg->image) : null,
-                'is_me' => true,
-                'time' => $msg->created_at->setTimezone('Asia/Jakarta')->format('H:i'),
-                'is_edited' => false,
-            ]
-        ]);
     }
 
     /**
      * EDIT & HAPUS PESAN
      */
-    public function updateMessage(Request $request, $id) {
+    public function updateMessage(Request $request, $id)
+    {
         $msg = Message::where('id', $id)->where('sender_id', Auth::id())->firstOrFail();
         $msg->update(['message' => $request->message]);
         return response()->json(['success' => true]);
     }
 
-    public function deleteMessage($id) {
+    public function deleteMessage($id)
+    {
         $msg = Message::where('id', $id)->where('sender_id', Auth::id())->firstOrFail();
-        if ($msg->image) Storage::disk('cloudinary')->delete($msg->image);
+        if ($msg->image) {
+            Storage::disk('cloudinary')->delete($msg->image);
+        }
         $msg->delete();
         return response()->json(['success' => true]);
     }

@@ -82,17 +82,18 @@
                                     'bg-white border border-slate-200 text-slate-700 rounded-2xl rounded-tl-none'"
                                     class="p-3 md:p-4 shadow-sm relative transition-all group-hover:shadow-md">
 
-                                    {{-- IMAGE HANDLING --}}
+                                    {{-- IMAGE HANDLING (FIXED FOR CLOUDINARY) --}}
                                     <template x-if="msg.image">
                                         <div class="mb-2 overflow-hidden rounded-xl bg-slate-100 border border-black/5">
-                                            <img :src="msg.image.startsWith('blob') || msg.image.startsWith('http') ? msg.image : '/storage/' + msg.image"
-                                                class="max-w-full w-full cursor-zoom-in hover:opacity-95 transition-opacity object-cover"
-                                                @click="window.open(msg.image.startsWith('blob') || msg.image.startsWith('http') ? msg.image : '/storage/' + msg.image)">
+                                            {{-- Perbaikan: Langsung gunakan msg.image jika itu URL Cloudinary (dimulai dengan http) --}}
+                                            <img :src="msg.image.startsWith('http') || msg.image.startsWith('blob') ? msg.image : '/storage/' + msg.image"
+                                                class="max-w-full w-full cursor-zoom-in hover:opacity-95 transition-opacity object-cover min-w-[200px] max-h-[300px]"
+                                                @click="window.open(msg.image.startsWith('http') || msg.image.startsWith('blob') ? msg.image : '/storage/' + msg.image)">
                                         </div>
                                     </template>
 
                                     <div class="relative">
-                                        <p class="text-xs md:text-sm leading-relaxed whitespace-pre-wrap" x-text="msg.text"></p>
+                                        <p x-show="msg.text" class="text-xs md:text-sm leading-relaxed whitespace-pre-wrap" x-text="msg.text"></p>
                                         <template x-if="msg.is_edited">
                                             <span class="text-[9px] opacity-60 italic block mt-1"
                                                   :class="msg.is_me ? 'text-white/80' : 'text-slate-400'">(disunting)</span>
@@ -157,7 +158,7 @@
                 </div>
             </div>
 
-            {{-- SIDEBAR DETAIL (HIDDEN ON MOBILE) --}}
+            {{-- SIDEBAR DETAIL --}}
             <div class="hidden lg:col-span-4 lg:flex flex-col gap-4">
                 <div class="bg-white border border-slate-200 rounded-[32px] p-6 shadow-sm overflow-hidden relative">
                     <h4 class="font-black text-slate-800 text-[10px] uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
@@ -192,11 +193,8 @@
         {{-- MODAL EDIT --}}
         <div x-show="showEditModal" x-cloak
             class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 scale-95"
-            x-transition:enter-end="opacity-100 scale-100">
-            <div class="bg-white rounded-[32px] w-full max-w-md shadow-2xl overflow-hidden"
-                @click.away="showEditModal = false">
+            x-transition:enter="transition ease-out duration-300">
+            <div class="bg-white rounded-[32px] w-full max-w-md shadow-2xl overflow-hidden" @click.away="showEditModal = false">
                 <div class="p-6 border-b border-slate-100 flex justify-between items-center">
                     <h3 class="font-black text-slate-800 text-xs uppercase tracking-widest">Edit Pesan</h3>
                     <button @click="showEditModal = false" class="text-slate-400 hover:text-red-500">
@@ -205,35 +203,26 @@
                 </div>
                 <div class="p-6">
                     <textarea x-model="editText" rows="4"
-                        class="w-full border border-slate-200 rounded-2xl p-4 text-sm focus:border-blue-400 outline-none ring-0 focus:ring-2 focus:ring-blue-100 transition-all"></textarea>
+                        class="w-full border border-slate-200 rounded-2xl p-4 text-sm focus:border-blue-400 outline-none"></textarea>
                 </div>
                 <div class="p-6 bg-slate-50 flex gap-3">
-                    <button @click="showEditModal = false"
-                        class="flex-1 py-3 text-xs font-black text-slate-400 hover:text-slate-600">Batal</button>
-                    <button @click="updateMessage"
-                        class="flex-1 py-3 bg-blue-600 text-white rounded-xl text-xs font-black shadow-lg hover:bg-blue-700 transition-colors">Simpan</button>
+                    <button @click="showEditModal = false" class="flex-1 py-3 text-xs font-black text-slate-400">Batal</button>
+                    <button @click="updateMessage" class="flex-1 py-3 bg-blue-600 text-white rounded-xl text-xs font-black">Simpan</button>
                 </div>
             </div>
         </div>
 
         {{-- MODAL DELETE --}}
         <div x-show="showDeleteModal" x-cloak
-            class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 scale-95"
-            x-transition:enter-end="opacity-100 scale-100">
-            <div class="bg-white rounded-[32px] w-full max-w-sm shadow-2xl overflow-hidden text-center p-8"
-                @click.away="showDeleteModal = false">
+            class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+            <div class="bg-white rounded-[32px] w-full max-w-sm shadow-2xl p-8 text-center" @click.away="showDeleteModal = false">
                 <div class="w-16 h-16 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center mx-auto mb-6">
                     <i class="fa-solid fa-trash-can text-2xl"></i>
                 </div>
                 <h3 class="text-lg font-black text-slate-800 mb-2">Hapus Pesan?</h3>
-                <p class="text-sm text-slate-500 mb-6">Tindakan ini tidak dapat dibatalkan.</p>
                 <div class="flex gap-3">
-                    <button @click="showDeleteModal = false"
-                        class="flex-1 py-3 text-xs font-black text-slate-400">Batal</button>
-                    <button @click="deleteMsg"
-                        class="flex-1 py-3 bg-red-500 text-white rounded-2xl text-xs font-black shadow-lg hover:bg-red-600 transition-colors">Ya, Hapus</button>
+                    <button @click="showDeleteModal = false" class="flex-1 py-3 text-xs font-black text-slate-400">Batal</button>
+                    <button @click="deleteMsg" class="flex-1 py-3 bg-red-500 text-white rounded-2xl text-xs font-black">Hapus</button>
                 </div>
             </div>
         </div>
@@ -271,7 +260,8 @@
 
                     this.messages = this.formatMessages(initialData);
                     this.scrollToBottom();
-                    setInterval(() => this.fetchMessages(), 4000);
+                    // Interval polling dipercepat sedikit untuk rasa real-time
+                    setInterval(() => this.fetchMessages(), 3000);
                 },
 
                 formatMessages(rawMessages) {
@@ -280,7 +270,7 @@
                         text: m.message,
                         image: m.image,
                         is_me: m.sender_type.toLowerCase() === 'user' && parseInt(m.sender_id) === this.currentUserId,
-                        is_edited: (new Date(m.updated_at).getTime() - new Date(m.created_at).getTime()) > 2000,
+                        is_edited: (new Date(m.updated_at).getTime() - new Date(m.created_at).getTime()) > 3000,
                         time: m.time
                     }));
                 },
@@ -310,11 +300,11 @@
                     if (!this.newMessage.trim() && !this.fileToUpload) return;
 
                     const formData = new FormData();
-                    formData.append('message', this.newMessage);
+                    formData.append('message', this.newMessage || '');
                     formData.append('booking_id', '{{ $booking->id ?? "" }}');
                     if (this.fileToUpload) formData.append('image', this.fileToUpload);
 
-                    // Optimistic UI updates
+                    // Bersihkan input segera (Optimistic UI)
                     const tempText = this.newMessage;
                     this.newMessage = '';
                     this.clearFile();
@@ -326,16 +316,15 @@
                             headers: {
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                                 'Accept': 'application/json'
-                                // JANGAN set Content-Type secara manual saat menggunakan FormData
                             }
                         });
 
-                        if (!response.ok) throw new Error('Network response was not ok');
+                        if (!response.ok) throw new Error('Upload gagal');
 
                         await this.fetchMessages();
                         this.scrollToBottom();
                     } catch (err) {
-                        alert('Gagal mengirim pesan. Cek koneksi Anda.');
+                        alert('Gagal mengirim pesan/foto. Pastikan konfigurasi Cloudinary di .env sudah benar.');
                         this.newMessage = tempText;
                     }
                 },
@@ -345,7 +334,14 @@
                         const response = await fetch('{{ route("chat.index") }}?ajax=1');
                         if (response.ok) {
                             const data = await response.json();
-                            this.messages = this.formatMessages(data);
+                            // Hanya update jika ada perubahan jumlah pesan untuk performa
+                            if (data.length !== this.messages.length) {
+                                this.messages = this.formatMessages(data);
+                                this.scrollToBottom();
+                            } else {
+                                // Tetap update untuk menangani status "Edited"
+                                this.messages = this.formatMessages(data);
+                            }
                         }
                     } catch (e) { console.error("Fetch error", e); }
                 },

@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\{Auth, Hash, Validator, Storage, Log, Mail}; // Tambahkan Mail
+use Illuminate\Support\Facades\{Auth, Hash, Validator, Storage, Log, Mail};
 use App\Models\User;
 use App\Models\Booking;
 use App\Models\Message;
-use App\Mail\AdminChatNotification; // Tambahkan Mailable
+use App\Mail\AdminChatNotification;
 use Carbon\Carbon;
+// Penting: Pastikan package cloudinary-laravel sudah terinstall
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class BookingAuthController extends Controller
 {
@@ -92,10 +94,10 @@ class BookingAuthController extends Controller
     {
         $userId = Auth::id();
 
-        // 1. Ambil semua pesan dua arah antara user ini dengan admin manapun
+        // 1. Ambil semua pesan dua arah antara user ini dengan admin
         $messages = Message::where(function ($q) use ($userId) {
-                $q->where('sender_id', $userId);
-            })
+            $q->where('sender_id', $userId);
+        })
             ->orWhere(function ($q) use ($userId) {
                 $q->where('receiver_id', $userId);
             })
@@ -110,13 +112,22 @@ class BookingAuthController extends Controller
         // 3. Response AJAX untuk Polling Alpine.js
         if ($request->ajax()) {
             $formattedMessages = $messages->map(function ($m) use ($userId) {
+                $imageUrl = null;
+                if ($m->image) {
+                    // Cek apakah data di DB sudah berupa URL Full atau masih path folder
+                    if (str_starts_with($m->image, 'http')) {
+                        $imageUrl = $m->image;
+                    } else {
+                        // Fallback jika masih tersimpan sebagai path local/storage
+                        $imageUrl = Storage::disk('cloudinary')->url($m->image);
+                    }
+                }
+
                 return [
                     'id' => $m->id,
                     'text' => $m->message,
-                    // Fix: Gunakan disk cloudinary agar gambar muncul di hosting
-                    'image' => $m->image ? Storage::disk('cloudinary')->url($m->image) : null,
+                    'image' => $imageUrl,
                     'sender_id' => $m->sender_id,
-                    // Di sisi User: true jika pengirimnya adalah user itu sendiri (Muncul di KANAN)
                     'is_me' => (int) $m->sender_id === (int) $userId,
                     'is_edited' => $m->created_at->ne($m->updated_at),
                     'time' => $m->created_at->timezone('Asia/Jakarta')->format('H:i'),
@@ -148,25 +159,42 @@ class BookingAuthController extends Controller
             ->latest()
             ->first();
 
-        // Target: admin yang membalas terakhir, atau admin ID 1
         $targetAdminId = $latestAdminMessage ? $latestAdminMessage->sender_id : $this->defaultAdminId;
 
-        // Simpan gambar ke Cloudinary
-        $imagePath = $request->hasFile('image') ? $request->file('image')->store('chats', 'cloudinary') : null;
+        $imagePath = null;
 
         try {
+            if ($request->hasFile('image')) {
+                // Cek konfigurasi Cloudinary terlebih dahulu
+                $cloudName = config('cloudinary.cloud');
+                $apiKey = config('cloudinary.key');
+                $apiSecret = config('cloudinary.secret');
+
+                if (!$cloudName || !$apiKey || !$apiSecret) {
+                    throw new \Exception('Konfigurasi Cloudinary tidak lengkap. Pastikan CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, dan CLOUDINARY_API_SECRET sudah diatur di file .env');
+                }
+
+                // Upload menggunakan Cloudinary facade langsung
+                $uploadedFile = Cloudinary::upload($request->file('image')->getRealPath(), [
+                    'folder' => 'chats',
+                    'public_id' => 'chat_' . time() . '_' . uniqid(),
+                    'resource_type' => 'image'
+                ]);
+                $imagePath = $uploadedFile->getSecurePath();
+            }
+
             $chat = Message::create([
                 'booking_id' => $request->booking_id ?? null,
                 'sender_id' => $userId,
                 'receiver_id' => $targetAdminId,
                 'message' => $request->message,
-                'image' => $imagePath,
+                'image' => $imagePath, // Menyimpan URL Lengkap
                 'sender_type' => 'user',
                 'is_read' => false,
                 'device_info' => substr($request->userAgent(), 0, 255),
             ]);
 
-            // LOGIKA NOTIFIKASI EMAIL KE ADMIN
+            // Kirim notifikasi email ke admin
             try {
                 Mail::to('project@rbmak.co.id')->send(new AdminChatNotification($chat));
             } catch (\Exception $e) {
@@ -179,17 +207,31 @@ class BookingAuthController extends Controller
                     'data' => [
                         'id' => $chat->id,
                         'text' => $chat->message,
-                        'image' => $chat->image ? Storage::disk('cloudinary')->url($chat->image) : null,
-                        'is_me' => true, // User adalah pengirim
+                        'image' => $chat->image,
+                        'is_me' => true,
                         'time' => $chat->created_at->timezone('Asia/Jakarta')->format('H:i')
                     ]
                 ]);
             }
 
             return back()->with('success', 'Pesan terkirim');
+
         } catch (\Exception $e) {
-            if ($imagePath) Storage::disk('cloudinary')->delete($imagePath);
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+            Log::error("Chat Send Error: " . $e->getMessage());
+
+            $errorMessage = 'Gagal mengirim pesan/foto. ';
+            if (str_contains($e->getMessage(), 'Konfigurasi Cloudinary')) {
+                $errorMessage .= $e->getMessage();
+            } elseif (str_contains($e->getMessage(), 'Invalid Signature') || str_contains($e->getMessage(), 'Unknown API key')) {
+                $errorMessage .= 'Konfigurasi Cloudinary di .env tidak valid. Periksa CLOUDINARY_API_KEY dan CLOUDINARY_API_SECRET.';
+            } else {
+                $errorMessage .= 'Pastikan konfigurasi Cloudinary di .env sudah benar.';
+            }
+
+            return response()->json([
+                'status' => 'error',
+                'message' => $errorMessage
+            ], 500);
         }
     }
 
