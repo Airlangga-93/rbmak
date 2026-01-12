@@ -236,19 +236,21 @@
                 <div
                     class="inline-flex flex-col md:flex-row items-center gap-3 md:gap-4 px-6 py-3 md:px-8 md:py-4 bg-white/60 backdrop-blur-md rounded-2xl md:rounded-full shadow-sm border border-white/50 mx-4">
                     <div class="flex -space-x-2 md:-space-x-3">
-                        <img src="https://ui-avatars.com/api/?name=User+1&background=2C3E50&color=fff"
-                            class="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 md:border-4 border-white">
-                        <img src="https://ui-avatars.com/api/?name=User+2&background=FFC300&color=2C3E50"
-                            class="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 md:border-4 border-white">
-                        <img src="https://ui-avatars.com/api/?name=User+3&background=E2E8F0&color=475569"
-                            class="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 md:border-4 border-white">
+                        {{-- Menggunakan URL yang lebih bersih tanpa karakter spasi yang berisiko --}}
+                        <img src="https://ui-avatars.com/api/?name=U1&background=2C3E50&color=fff" alt="User Avatar"
+                            class="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 md:border-4 border-white object-cover">
+
+                        <img src="https://ui-avatars.com/api/?name=U2&background=FFC300&color=2C3E50" alt="User Avatar"
+                            class="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 md:border-4 border-white object-cover">
+
+                        <img src="https://ui-avatars.com/api/?name=U3&background=E2E8F0&color=475569" alt="User Avatar"
+                            class="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 md:border-4 border-white object-cover">
                     </div>
                     <p class="text-slate-500 text-[10px] md:text-xs font-semibold italic tracking-wide">
                         Feedback Anda diproses secara rahasia untuk peningkatan layanan.
                     </p>
                 </div>
             </div>
-        </div>
     </section>
 
     {{-- Load Scripts --}}
