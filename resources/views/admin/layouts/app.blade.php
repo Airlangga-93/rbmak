@@ -121,8 +121,7 @@
 
                 <div x-show="editorOpen" x-collapse x-cloak class="mt-1 ml-4 border-l-2 border-slate-100 space-y-1">
                     @php
-                        $submenus = [
-                            ['route' => 'admin.abouts.index', 'icon' => 'bi-info-circle', 'label' => 'Tentang Kami'],
+                        $submenus = [                          
                             ['route' => 'admin.news.index', 'icon' => 'bi-newspaper', 'label' => 'Berita & Artikel'],
                             ['route' => 'admin.products.index', 'icon' => 'bi-box-seam', 'label' => 'Produk & Jasa'],
                             ['route' => 'admin.galleries.index', 'icon' => 'bi-images', 'label' => 'Galeri Foto'],
