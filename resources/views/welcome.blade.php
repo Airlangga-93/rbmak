@@ -246,7 +246,7 @@
                 $fitur = [
                     [
                         'icon' => 'fa-user-plus',
-                        'title' => 'Client Portal',
+                        'title' => 'Booking Custumer',
                         'desc' => 'Daftar & Booking survei',
                         'link' => route('booking.login'),
                         'color' => $amaliahOrange,
