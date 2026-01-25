@@ -260,6 +260,7 @@
                         </div>
                     </div>
 
+<<<<<<< HEAD
                     <a href="{{ route('products') }}"
                         class="nav-link {{ Request::is('products*') ? 'nav-active' : '' }}">Produk</a>
                     <a href="{{ route('news.index') }}"
@@ -280,6 +281,19 @@
                                 class="block px-5 py-3 text-sm text-gray-600 hover:bg-orange-50 hover:text-rbm-accent transition-colors">FAQs</a>
                             <a href="{{ route('syaratketentuan') }}"
                                 class="block px-5 py-3 text-sm text-gray-600 hover:bg-orange-50 hover:text-rbm-accent transition-colors">Legalitas</a>
+=======
+                    <a href="{{ route('products') }}" class="nav-link {{ Request::is('products*') ? 'nav-active' : '' }}">Produk</a>
+                    <a href="{{ route('news.index') }}" class="nav-link {{ Request::is('news*') ? 'nav-active' : '' }}">Berita</a>
+                    <a href="{{ route('facilities.index') }}" class="nav-link {{ Request::is('facilities*') ? 'nav-active' : '' }}">Fasilitas</a>
+                    <a href="{{ route('kontak') }}" class="nav-link {{ Request::is('kontak*') ? 'nav-active' : '' }}">Kontak</a>
+
+                    <div class="relative group h-full flex items-center">
+                        <button class="nav-link">Bantuan <i class="fa-solid fa-chevron-down ml-1 text-[8px]"></i></button>
+                        <div class="absolute top-full dropdown-content bg-white shadow-2xl border border-gray-100 rounded-b-xl py-2 w-48 overflow-hidden z-[60]">
+                            <a href="{{ route('faq') }}" class="block px-5 py-3 text-sm text-gray-600 hover:bg-orange-50 hover:text-rbm-accent transition-colors">FAQs</a>
+                            <a href="{{ route('syaratketentuan') }}" class="block px-5 py-3 text-sm text-gray-600 hover:bg-orange-50 hover:text-rbm-accent transition-colors">Legalitas</a>
+                            <a href="{{ route('feedback.create') }}" class="block px-5 py-3 text-sm text-gray-600 hover:bg-orange-50 hover:text-rbm-accent transition-colors">Feedback</a>
+>>>>>>> 2c511e552552d96062ee847ba50016ea48df3f82
                         </div>
                     </div>
                 </div>
@@ -321,12 +335,15 @@
                     <a href="{{ route('kontak') }}"
                         class="block px-4 py-3 text-gray-700 font-bold text-[13px] uppercase">Kontak</a>
 
+<<<<<<< HEAD
                     {{-- FIXED: MENU FEEDBACK UNTUK MOBILE --}}
                     <a href="{{ route('feedback.create') }}"
                         class="block px-4 py-3 text-gray-700 font-bold text-[13px] uppercase {{ Request::is('feedback*') ? 'text-rbm-accent' : '' }}">
                         Feedback
                     </a>
 
+=======
+>>>>>>> 2c511e552552d96062ee847ba50016ea48df3f82
                     <div x-data="{ open: false }">
                         <button @click="open = !open"
                             class="w-full flex justify-between items-center px-4 py-3 text-gray-700 font-bold text-[13px] uppercase">
@@ -335,10 +352,16 @@
                                 :class="{ 'rotate-180': open }"></i>
                         </button>
                         <div x-show="open" x-collapse class="bg-gray-50 rounded-xl mx-2 my-1 overflow-hidden">
+<<<<<<< HEAD
                             <a href="{{ route('faq') }}"
                                 class="block px-6 py-3 text-[12px] text-gray-600 font-medium">FAQs</a>
                             <a href="{{ route('syaratketentuan') }}"
                                 class="block px-6 py-3 text-[12px] text-gray-600 font-medium">Legalitas</a>
+=======
+                            <a href="{{ route('faq') }}" class="block px-6 py-3 text-[12px] text-gray-600 font-medium">FAQs</a>
+                            <a href="{{ route('syaratketentuan') }}" class="block px-6 py-3 text-[12px] text-gray-600 font-medium">Legalitas</a>
+                            <a href="{{ route('feedback.create') }}" class="block px-6 py-3 text-[12px] text-gray-600 font-medium">Feedback</a>
+>>>>>>> 2c511e552552d96062ee847ba50016ea48df3f82
                         </div>
                     </div>
 
@@ -355,9 +378,14 @@
         <main class="min-h-[60vh]">
             {{-- FLOATING ACTIONS --}}
             <div class="fixed bottom-6 right-4 md:right-6 z-40 flex flex-col gap-3">
+<<<<<<< HEAD
                 <button x-data="{ shown: false }" x-init="window.addEventListener('scroll', () => { shown = window.scrollY > 400 })" x-show="shown" x-transition
                     @click="window.scrollTo({ top: 0, behavior: 'smooth' })"
                     class="w-11 h-11 bg-white text-rbm-dark shadow-2xl rounded-full flex items-center justify-center border border-gray-100 hover:bg-gray-50 transition transform active:scale-90">
+=======
+                <button x-data="{ shown: false }" x-init="window.addEventListener('scroll', () => { shown = window.scrollY > 400 })" x-show="shown" x-transition @click="window.scrollTo({ top: 0, behavior: 'smooth' })"
+                    class="w-11 h-11 bg-rbm-accent text-white shadow-2xl rounded-full flex items-center justify-center border border-orange-600 hover:bg-orange-600 transition transform active:scale-90">
+>>>>>>> 2c511e552552d96062ee847ba50016ea48df3f82
                     <i class="fas fa-arrow-up"></i>
                 </button>
                 <a href="https://wa.me/{{ $whatsappNumber }}" target="_blank"
@@ -414,6 +442,7 @@
                                 class="absolute -bottom-2 left-0 w-8 h-0.5 bg-rbm-accent rounded-full"></span>
                         </h4>
                         <ul class="space-y-3 text-[13px] text-rbm-light-text font-medium">
+<<<<<<< HEAD
                             <li><a href="{{ route('faq') }}"
                                     class="hover:text-white transition-colors flex items-center gap-2"><i
                                         class="fa-solid fa-chevron-right text-[8px] text-rbm-accent"></i> FAQ</a></li>
@@ -425,6 +454,12 @@
                                     class="hover:text-white transition-colors flex items-center gap-2"><i
                                         class="fa-solid fa-chevron-right text-[8px] text-rbm-accent"></i> Syarat &
                                     Ketentuan</a></li>
+=======
+                            <li><a href="{{ route('faq') }}" class="hover:text-white transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[8px] text-rbm-accent"></i> FAQ</a></li>
+                            <li><a href="{{ route('kontak') }}" class="hover:text-white transition-colors flex items-center gap-2 group"><i class="fa-solid fa-chevron-right text-[8px] text-rbm-accent group-hover:translate-x-1 transition-transform"></i> Hubungi Kami</a></li>
+                            <li><a href="{{ route('syaratketentuan') }}" class="hover:text-white transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[8px] text-rbm-accent"></i> Syarat & Ketentuan</a></li>
+                            <li><a href="{{ route('feedback.create') }}" class="hover:text-white transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[8px] text-rbm-accent"></i> Feedback</a></li>
+>>>>>>> 2c511e552552d96062ee847ba50016ea48df3f82
                         </ul>
                     </div>
 
